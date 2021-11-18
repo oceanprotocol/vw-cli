@@ -1,14 +1,4 @@
-Note: on 20200526, this code was moved to https://github.com/oceanprotocol/ocean-lib-py. We'll evolve it from there.
-
-Therefore this repo is obsolete. But, keep it around for now, because the oceanprotocol/ocean-lib-py will evolve, and we can use this repo for reference.
-
-----
-
-# ocean-lib-py
-
-Compile, test, and deploy Ocean datatokens with the help of [Brownie](https://eth-brownie.readthedocs.io). Datatokens are ERC20 tokens with an extra 'blob' parameter.
-
-Note: we don't use a Factory contract here. It just deploys the tokens individually.
+# Scheduler
 
 # Installation
 
@@ -22,8 +12,8 @@ npm install ganache-cli --global
 export NODE_OPTIONS=--openssl-legacy-provider
 
 #clone repo
-git clone https://github.com/trentmc/ocean-lib-py.git
-cd ocean-lib-py
+git clone https://github.com/trentmc/scheduler.git
+cd scheduler
 
 #create a virtual environment
 python3 -m venv venv
@@ -36,27 +26,7 @@ pip install wheel
 pip install -r requirements.txt
 ```
 
-
-# Usage: From Terminal
-
-In terminal:
-```console
-#set private keys
-export OCEAN_PRIVATE_KEY1=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b7
-export OCEAN_PRIVATE_KEY2=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b8
-
-#compile
-brownie compile
-
-#test
-brownie test
-
-#run quickstart
-python quickstart.py
-```
-
-
-# Usage: In Brownie Console
+# Usage: Brownie Console
 
 From terminal:
 ```console
@@ -75,14 +45,16 @@ Transaction sent: 0x9d20d3239d5c8b8a029f037fe573c343efd9361efd4d99307e0f5be74993
 '123.com'
 ```
 
-# Quickstart snippet
+# Usage: Python Console
 
-## 1. Alice publishes a dataset (= publishes a datatoken contract)
+From terminal:
+```console
+python
+```
 
-
-Open a Python terminal and:
+In Python console:
 ```python
-from ocean_lib import Ocean
+from scripts import Ocean
 config = {
    'network' : 'development',
    'privateKey' : 'cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b7',
@@ -92,3 +64,22 @@ account = ocean.account
 dt = ocean.createDatatoken('blob_str')
 print(dt.address)
 ```
+
+# Usage: Running Python Scripts
+
+In terminal:
+```console
+#set private keys
+export OCEAN_PRIVATE_KEY1=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b7
+export OCEAN_PRIVATE_KEY2=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b8
+
+#compile
+brownie compile
+
+#test
+brownie test
+
+#run quickstart
+python scripts/quickstart.py
+```
+

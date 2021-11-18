@@ -4,8 +4,8 @@ def main():
     alice_private_key = os.getenv('OCEAN_PRIVATE_KEY1')
     bob_private_key = os.getenv('OCEAN_PRIVATE_KEY2')
     
-    #1. Alice publishes a dataset (= publishes a datatoken contract)
-    from ocean_lib import Ocean
+    #Alice publishes a dataset (= publishes a datatoken contract)
+    import Ocean
     config = {
         'network' : 'development', #see 'brownie network lists'
         'privateKey' : alice_private_key,
@@ -16,13 +16,7 @@ def main():
     dt_address = token.address
     print(dt_address)
 
-    #2. Alice hosts the dataset
-    #(FIXME)
-    
-    #3. Alice mints 100 tokens
-    #(FIXME)
-
-    #4. Alice transfers 1 token to Bob
+    #Alice transfers 1 token to Bob
     bob_account = ocean.accountFromKey(bob_private_key)
     token.transfer(bob_account.address, 1)
 

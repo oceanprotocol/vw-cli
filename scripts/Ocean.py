@@ -13,7 +13,7 @@ class Ocean:
 
     def __del__(self):
         """Need to shut down the connection on destruct, otherwise errors"""
-        if brownie.network.is_connected():
+        if brownie is not None and brownie.network.is_connected():
             brownie.network.disconnect()
 
     def accountFromKey(self, private_key):

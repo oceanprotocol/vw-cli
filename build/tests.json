@@ -1,0 +1,83 @@
+{
+  "contracts": {
+    "Datatoken": "f95820a7d8107818b90166fe89d37d0241f2c83c",
+    "SafeMath": "3232e80569be845f6931e64f6278c8c0c6be0329"
+  },
+  "tests": {
+    "tests/test_approve_transferFrom.py": {
+      "coverage": false,
+      "isolated": [
+        "Datatoken",
+        "SafeMath"
+      ],
+      "results": "......",
+      "sha1": "df265ebae95194410bee32d300590089a1204139",
+      "txhash": [
+        "05333d5b29b444acbbb649f42f0a277ee8cec63d",
+        "615fb790cb8d6ba1d6d26f23a560f2b50b95a0e4",
+        "8c6a65777e1b74b2fcfcd6d1dc21cf449e055acc"
+      ]
+    },
+    "tests/test_blob.py": {
+      "coverage": false,
+      "isolated": [
+        "Datatoken",
+        "SafeMath"
+      ],
+      "results": ".",
+      "sha1": "66ce8ee50a1bf515cd028af0bf702eb8f9998f4b",
+      "txhash": []
+    },
+    "tests/test_transfer.py": {
+      "coverage": false,
+      "isolated": [
+        "Datatoken",
+        "SafeMath"
+      ],
+      "results": ".",
+      "sha1": "7ef60f3e53e6bf3ed57a65c170a188bfdbc56292",
+      "txhash": []
+    }
+  },
+  "tx": {
+    "05333d5b29b444acbbb649f42f0a277ee8cec63d": {
+      "Datatoken": {
+        "0": [
+          [
+            4
+          ],
+          [
+            20
+          ],
+          []
+        ]
+      }
+    },
+    "615fb790cb8d6ba1d6d26f23a560f2b50b95a0e4": {
+      "Datatoken": {
+        "0": [
+          [
+            4
+          ],
+          [
+            20
+          ],
+          []
+        ]
+      }
+    },
+    "8c6a65777e1b74b2fcfcd6d1dc21cf449e055acc": {
+      "Datatoken": {
+        "0": [
+          [
+            4
+          ],
+          [
+            20
+          ],
+          []
+        ]
+      }
+    }
+  }
+}

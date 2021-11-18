@@ -107,7 +107,7 @@ In terminal:
 #run script
 export OCEAN_PRIVATE_KEY1=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b7
 export OCEAN_PRIVATE_KEY2=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b8
-python scripts/quickstart.py
+python scripts/dt.py
 ```
 
 Output is like:

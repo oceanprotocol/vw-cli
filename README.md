@@ -83,3 +83,19 @@ brownie test
 python scripts/quickstart.py
 ```
 
+Output should be something like:
+```console
+
+Launching 'ganache-cli --accounts 10 --hardfork istanbul --gasLimit 6721975 --mnemonic brownie --port 8545'...
+Transaction sent: 0x3ec84a608396dc5516b2f80cee4af2f2c6ade54f98846fa94db8c999dff5823b
+  Gas price: 0.0 gwei   Gas limit: 6721975   Nonce: 0
+  Datatoken.constructor confirmed   Block: 1   Gas used: 601154 (8.94%)
+  Datatoken deployed at: 0x1678666e6A05a74cfE19f2Bb31eccf306206065C
+
+0x1678666e6A05a74cfE19f2Bb31eccf306206065C
+Transaction sent: 0x6640df70ee894b36d22a1cb07a882311fad0d44da581c7dcaa838a75f07c85c1
+  Gas price: 0.0 gwei   Gas limit: 6721975   Nonce: 1
+  Datatoken.transfer confirmed   Block: 2   Gas used: 50599 (0.75%)
+
+Terminating local RPC client...
+```

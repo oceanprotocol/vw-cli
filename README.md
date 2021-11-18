@@ -24,7 +24,34 @@ source venv/bin/activate
 #install dependencies. Install wheel first to avoid errors.
 pip install wheel
 pip install -r requirements.txt
+
+#install openzeppelin library, to import from .sol files
+brownie pm install OpenZeppelin/openzeppelin-contracts@4.0.0
 ```
+
+# Compiling
+
+From terminal:
+```console
+brownie compile
+```
+
+It should output:
+```text
+Brownie v1.17.1 - Python development framework for Ethereum
+
+Compiling contracts...
+  Solc version: 0.8.10
+  Optimizer: Enabled  Runs: 200
+  EVM Version: Istanbul
+Generating build data...
+ - OpenZeppelin/openzeppelin-contracts@4.0.0/IERC20
+ ...
+ - VestingWallet
+ 
+Project has been compiled. Build artifacts saved at /home/trentmc/code/scheduler/build/contracts
+ ```
+
 
 # Usage: Brownie Console
 
@@ -65,27 +92,26 @@ dt = ocean.createDatatoken('blob_str')
 print(dt.address)
 ```
 
+# Usage: Running Tests
+
+In terminal:
+```console
+#run tests
+brownie test
+```
+
 # Usage: Running Python Scripts
 
 In terminal:
 ```console
-#set private keys
+#run script
 export OCEAN_PRIVATE_KEY1=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b7
 export OCEAN_PRIVATE_KEY2=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b8
-
-#compile
-brownie compile
-
-#test
-brownie test
-
-#run quickstart
 python scripts/quickstart.py
 ```
 
-Output should be something like:
-```console
-
+Output is like:
+```text
 Launching 'ganache-cli --accounts 10 --hardfork istanbul --gasLimit 6721975 --mnemonic brownie --port 8545'...
 Transaction sent: 0x3ec84a608396dc5516b2f80cee4af2f2c6ade54f98846fa94db8c999dff5823b
   Gas price: 0.0 gwei   Gas limit: 6721975   Nonce: 0

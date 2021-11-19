@@ -100,7 +100,7 @@ In terminal:
 brownie test
 ```
 
-# Usage: Running Python Scripts
+# Usage: Running Datatoken Script
 
 In terminal:
 ```console
@@ -124,4 +124,15 @@ Transaction sent: 0x6640df70ee894b36d22a1cb07a882311fad0d44da581c7dcaa838a75f07c
   Datatoken.transfer confirmed   Block: 2   Gas used: 50599 (0.75%)
 
 Terminating local RPC client...
+```
+
+# Usage: Running Scheduler Script
+
+In terminal:
+```console
+#run script
+export OCEAN_PRIVATE_KEY1=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b7
+export OCEAN_PRIVATE_KEY2=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b8
+./scripts/scheduler run
+./scripts/scheduler plot
 ```

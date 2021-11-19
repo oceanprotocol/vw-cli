@@ -2,5 +2,5 @@ eth-brownie
 eth-account
 eth-keys
 eth-utils
-eth-brownie
+
 

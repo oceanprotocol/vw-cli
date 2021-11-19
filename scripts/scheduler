@@ -9,16 +9,16 @@ DEBUG = logging.DEBUG
 WARNING = logging.WARNING
 
 #==========================================================================
-#tsp help
+#scheduler help
 HELP_MAIN = """
-Usage: tsp run|plot [ARGS]
+Usage: scheduler run|plot [ARGS]
 Run TokenSPICE engine then plot results.
 
 TOOLS: 
   === Generate results and plot ===
-  tsp run [[Run TokenSPICE simulation. Input netlist. Output rundir w/ csv.]]
-  tsp plot [[Plot results from 1 run. Input csv. Output pngs.]]
-  tsp showstats [[Show performance statistics for a run]]
+  scheduler run [[Run TokenSPICE simulation. Input netlist. Output rundir w/ csv.]]
+  scheduler plot [[Plot results from 1 run. Input csv. Output pngs.]]
+  scheduler showstats [[Show performance statistics for a run]]
 
   === Tests === 
   pytest [[run all tests]]
@@ -31,18 +31,18 @@ TOOLS:
   -Logging: ./logging.conf
 
   == Example flow ==
-  rm -rf outdir_csv; tsp run assets/netlists/simplegrant/netlist.py outdir_csv
-  rm -rf outdir_png; tsp plot assets/netlists/simplegrant/netlist.py outdir_csv outdir_png
+  rm -rf outdir_csv; scheduler run assets/netlists/simplegrant/netlist.py outdir_csv
+  rm -rf outdir_png; scheduler plot assets/netlists/simplegrant/netlist.py outdir_csv outdir_png
   eog outdir_png
  """
     
 
 #========================================================================
-#tsp run
+#scheduler run
 import importlib
 
 HELP_RUN = """
-Usage: tsp run NETLIST OUTPUT_DIR [DO_PROFILE]
+Usage: scheduler run NETLIST OUTPUT_DIR [DO_PROFILE]
 
  NETLIST -- string -- pathname for netlist
  OUTPUT_DIR -- string -- output directory for csv file.
@@ -86,7 +86,7 @@ def do_run():
         import cProfile
         stats_filename = os.path.join(output_dir, 'stats')
         cProfile.run('engine.run()', stats_filename)
-        print(f'Output stats file: {stats_filename}. To see: tsp showstats outdir_csv/stats 20 cumulative')
+        print(f'Output stats file: {stats_filename}. To see: scheduler showstats outdir_csv/stats 20 cumulative')
     print(f'Output directory: {output_dir}')
 
 def _importNetlistModule(netlist_str: str):
@@ -96,10 +96,10 @@ def _importNetlistModule(netlist_str: str):
     
 
 #==========================================================================
-#tsp plot
+#scheduler plot
 
 HELP_PLOT = """
-Usage: tsp plot NETLIST INPUT_CSV_DIR OUTPUT_PNG_DIR
+Usage: scheduler plot NETLIST INPUT_CSV_DIR OUTPUT_PNG_DIR
 
  NETLIST -- string -- pathname for netlist
  INPUT_CSV_DIR -- string -- input directory for csv file. 

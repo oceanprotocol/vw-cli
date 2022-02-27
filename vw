@@ -201,22 +201,22 @@ def do_release():
     print("Funds have been released.")
 
 # ========================================================================
-def do_balance():
-    HELP_BALANCE = f"""
+def do_getbalance():
+    HELP_GETBALANCE = f"""
     Vesting wallet - see balance of a token for an account  
 
-    Usage: vw balance NETWORK TOKEN_ADDR ACCOUNT_ADDR
+    Usage: vw getbalance NETWORK TOKEN_ADDR ACCOUNT_ADDR
 
      NETWORK -- one of {NETWORKS}
      ACCOUNT_ADDR -- account address, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
     """
     if len(sys.argv) not in [5]:
-        print(HELP_BALANCE)
+        print(HELP_GETBALANCE)
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "balance"
+    assert sys.argv[1] == "getbalance"
     NETWORK = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
     ACCOUNT_ADDR = sys.argv[4]
@@ -247,8 +247,8 @@ def do_main():
         do_mine()
     elif sys.argv[1] == "release":
         do_release()
-    elif sys.argv[1] == "balance":
-        do_balance()
+    elif sys.argv[1] == "getbalance":
+        do_getbalance()
     else:
         do_help()
 

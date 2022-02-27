@@ -27,12 +27,12 @@ Usage: vw help|token|..
   vw accountinfo - info about an account
   vw walletinfo - info about a vesting wallet
 
-Typical usage flows:
+Typical usage flows: (** = production)
   Run on ganache: token -> fund -> mine -> release
   Run on testnet w test token: token -> fund -> (wait) -> release
   Run on testnet w existing token: fund -> (wait) -> release
   Run on mainnet w test token: token -> fund -> (wait) -> release
-  Run on mainnet w existing token: fund -> (wait) -> release
+  ** Run on mainnet w existing token: fund -> (wait) -> release
 """
 def show_help():
     print(HELP_MAIN)

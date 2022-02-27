@@ -262,12 +262,16 @@ def show_released():
 
     #brownie setup
     brownie.network.connect(NETWORK)
+    chain = brownie.network.chain
 
     #release the token
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
     wallet = BROWNIE_PROJECT.VestingWallet.at(WALLET_ADDR)
-    print(f"For wallet {WALLET_ADDR[:5]}.., token '{token.symbol()}', {fromBase18(wallet.released(TOKEN_ADDR))} of the token has been released")
-    
+    amt_vested = wallet.vestedAmount(token.address, chain[-1].timestamp)
+    amt_released = wallet.released(token.address)
+    print(f"For wallet {WALLET_ADDR[:5]}.., token '{token.symbol()}':")
+    print(f"  amt vested: {fromBase18(amt_vested)}")
+    print(f"  amt released: {fromBase18(amt_released)}")
     
 # ========================================================================
 # main

@@ -1,4 +1,4 @@
-# Scheduler
+# Vesting Wallet
 
 # Installation
 
@@ -9,8 +9,8 @@ Open a new terminal and:
 npm install ganache-cli --global
 
 #clone repo
-git clone https://github.com/trentmc/scheduler.git
-cd scheduler
+git clone https://github.com/trentmc/vesting_wallet.git
+cd vesting_wallet
 
 #create a virtual environment
 python3 -m venv venv
@@ -46,10 +46,10 @@ Generating build data...
  ...
  - VestingWallet
  
-Project has been compiled. Build artifacts saved at /home/trentmc/code/scheduler/build/contracts
+Project has been compiled. Build artifacts saved at /home/trentmc/code/vesting_wallet/build/contracts
  ```
 
-# Usage: Running Scheduler Script
+# Usage: Running Vesting_Wallet Script
 
 In terminal:
 ```console

@@ -204,7 +204,7 @@ def do_release():
     print("Funds have been released.")
 
 # ========================================================================
-def show_balance():
+def show_accountinfo():
     HELP_ACCOUNTINFO = f"""
     Vesting wallet - info about an account
 
@@ -295,7 +295,7 @@ def do_main():
 
     #read actions
     elif sys.argv[1] == "accountinfo":
-        show_balance()
+        show_accountinfo()
     elif sys.argv[1] == "walletinfo":
         show_walletinfo()
     else:

@@ -15,24 +15,27 @@ NETWORKS = ['development', 'eth_mainnet'] #development = ganache
 HELP_MAIN = """
 Vesting wallet main help
 
-Usage: vw help|token|..
+Usage: vw fund|release|..
 
-  vw help - this message
+  vw fund - send funds with vesting wallet
+  vw release - request vesting wallet to release funds
 
   vw token - create token, for testing
-  vw fund - send funds with vesting wallet
   vw mine - force chain to pass time (ganache only)
-  vw release - request vesting wallet to release funds
 
   vw accountinfo - info about an account
   vw walletinfo - info about a vesting wallet
 
-Typical usage flows: (** = production)
+  vw help - this message
+
+Production flow:
+  Run on mainnet w existing token: fund -> (wait) -> release
+
+Test flows:
   Run on ganache: token -> fund -> mine -> release
   Run on testnet w test token: token -> fund -> (wait) -> release
   Run on testnet w existing token: fund -> (wait) -> release
   Run on mainnet w test token: token -> fund -> (wait) -> release
-  ** Run on mainnet w existing token: fund -> (wait) -> release
 """
 def show_help():
     print(HELP_MAIN)

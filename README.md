@@ -136,11 +136,10 @@ You will see something like:
 ```text
 Vesting wallet main help
 
-Usage: vw help|token|..
+Usage: vw fund|release|..
 
-  vw help - this message
-  vw token - create token, for testing
   vw fund - send funds with vesting wallet
+  vw release - request vesting wallet to release funds
   ...
 ```
 

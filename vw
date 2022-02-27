@@ -15,13 +15,14 @@ NETWORKS = ['development', 'eth_mainnet'] #development = ganache
 HELP_MAIN = """
 Vesting wallet main help
 
-Usage: vw help|token|fund|mine|release
+Usage: vw help|token|fund|mine|release|balance
 
   vw help - this message
   vw token - create token, for testing
   vw fund - send funds with vesting wallet
   vw mine - force chain to pass time (ganache only)
   vw release - request vesting wallet to release funds
+  vw balance - view a token balance 
 
 Typical usage flows:
   Run on ganache: token -> fund -> mine -> release
@@ -199,8 +200,41 @@ def do_release():
     vesting_wallet = BROWNIE_PROJECT.VestingWallet.at(WALLET_ADDR)
     vesting_wallet.release(TOKEN_ADDR, {"from": from_account})
     
-    print("Done.")
+    print("Funds have been released.")
 
+# ========================================================================
+def do_balance():
+    HELP_BALANCE = f"""
+    Vesting wallet - see balance of a token for an account  
+
+    Usage: vw balance TOKEN_ADDR ACCOUNT_ADDR NETWORK
+
+     ACCOUNT_ADDR -- account address, e.g. '0x987...'
+     TOKEN_ADDR -- e.g. '0x123..'
+     NETWORK -- one of {NETWORKS}
+    """
+    if len(sys.argv) not in [5]:
+        print(HELP_BALANCE)
+        sys.exit(0)
+
+    # extract inputs
+    assert sys.argv[1] == "balance"
+    TOKEN_ADDR = sys.argv[2]
+    ACCOUNT_ADDR = sys.argv[3]
+    NETWORK = sys.argv[4]
+
+    print(f"Arguments: TOKEN_ADDR={TOKEN_ADDR} ACCOUNT_ADDR={ACCOUNT_ADDR}, "
+          f", NETWORK={NETWORK}"
+    )
+
+    #brownie setup
+    brownie.network.connect(NETWORK) 
+    accounts = brownie.network.accounts
+    chain = brownie.network.chain
+
+    #release the token
+    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+    print(f"Balance of token '{token.symbol()}' at address {ACCOUNT_ADDR[:5]}..: {token.balanceOf(ACCOUNT_ADDR)}")
     
 # ========================================================================
 # main
@@ -216,6 +250,8 @@ def do_main():
         do_mine()
     elif sys.argv[1] == "release":
         do_release()
+    elif sys.argv[1] == "balance":
+        do_balance()
     else:
         do_help()
 

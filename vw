@@ -100,15 +100,14 @@ Usage: vw fund NETWORK TOKEN_ADDR LOCK_TIME AMT TO_ADDR
 def do_batch():
     HELP_FUND = f"""Vesting wallet - batch send funds via vesting wallets
 
-Usage: vw batch NETWORK TOKEN_ADDR AMT LOCK_TIME CSV
+Usage: vw batch NETWORK TOKEN_ADDR LOCK_TIME CSV
 
   NETWORK -- one of {NETWORKS}
   TOKEN_ADDR -- address of token being sent. Eg 0x967da4048cd07ab37855c090aaf366e4ce1b9f48 for OCEAN on eth mainnet
   LOCK_TIME -- Eg '10' (10 seconds) or '63113852' (2 years)
-  AMT -- e.g. '1000' (base-18, not wei)
   CSV -- csv file, where each row has: amt, address of beneficiary"""
 
-    if len(sys.argv) not in [7]:
+    if len(sys.argv) not in [6]:
         print(HELP_FUND)
         sys.exit(0)
 
@@ -129,11 +128,11 @@ Usage: vw batch NETWORK TOKEN_ADDR AMT LOCK_TIME CSV
         reader = csv.reader(csv_file)
         for row in reader:
             (AMT, TO_ADDR) = row
-            print(f"call vw fund for addr: {ADDR[:5]}..")
+            print(f"call vw fund for TO_ADDR: {TO_ADDR[:5]}..")
             os.system(
                 f"vw fund {NETWORK} {TOKEN_ADDR} {LOCK_TIME} {AMT} {TO_ADDR}")
     
-    print(f"Done. Vesting wallet address: {vesting_wallet.address}")
+    print(f"Done batch.")
 
 
 # ========================================================================
@@ -328,7 +327,7 @@ def do_main():
     elif sys.argv[1] == "fund":
         do_fund()
     elif sys.argv[1] == "batch":
-        do_fund()
+        do_batch()
     elif sys.argv[1] == "mine":
         do_mine()
     elif sys.argv[1] == "release":

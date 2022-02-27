@@ -31,7 +31,7 @@ Typical usage flows:
   Run on mainnet w test token: token -> fund -> (wait) -> release
   Run on mainnet w existing token: fund -> (wait) -> release
 """
-def do_help():
+def show_help():
     print(HELP_MAIN)
     sys.exit(0)
 
@@ -201,22 +201,22 @@ def do_release():
     print("Funds have been released.")
 
 # ========================================================================
-def do_getbalance():
-    HELP_GETBALANCE = f"""
+def show_balance():
+    HELP_SHOWBALANCE = f"""
     Vesting wallet - see balance of a token for an account  
 
-    Usage: vw getbalance NETWORK TOKEN_ADDR ACCOUNT_ADDR
+    Usage: vw showbalance NETWORK TOKEN_ADDR ACCOUNT_ADDR
 
      NETWORK -- one of {NETWORKS}
      ACCOUNT_ADDR -- account address, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
     """
     if len(sys.argv) not in [5]:
-        print(HELP_GETBALANCE)
+        print(HELP_SHOWBALANCE)
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "getbalance"
+    assert sys.argv[1] == "showbalance"
     NETWORK = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
     ACCOUNT_ADDR = sys.argv[4]
@@ -237,8 +237,7 @@ def do_getbalance():
 # main
 def do_main():
     if len(sys.argv) == 1 or sys.argv[1] == "help":
-        do_help()
-
+        show_help()
     elif sys.argv[1] == "token":
         do_token()
     elif sys.argv[1] == "fund":
@@ -247,10 +246,10 @@ def do_main():
         do_mine()
     elif sys.argv[1] == "release":
         do_release()
-    elif sys.argv[1] == "getbalance":
-        do_getbalance()
+    elif sys.argv[1] == "showbalance":
+        show_balance()
     else:
-        do_help()
+        show_help()
 
 if __name__ == "__main__":
     do_main()

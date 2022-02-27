@@ -5,6 +5,8 @@ import sys
 
 import brownie
 
+from util.base18 import toBase18
+
 BROWNIE_PROJECT = brownie.project.load("./", name="MyProject")
 
 NETWORKS = ['development', 'eth_mainnet'] #development = ganache
@@ -101,7 +103,7 @@ def do_fund():
     TO_ADDR = sys.argv[5]
     NETWORK = sys.argv[6]
     print(
-        f"Arguments: AMT={AMT}, TOKEN_ADDR={TOKEN_ADDR}, "
+        f"Arguments: AMT={AMT}, TOKEN_ADDR={TOKEN_ADDR}"
         f", LOCK_TIME={LOCK_TIME}, TO_ADDR={TO_ADDR}, NETWORK={NETWORK}"
     )
 
@@ -117,15 +119,16 @@ def do_fund():
     from_account = accounts[0] #FIXME for non-ganache
 
     #grab token
-    token = BROWNIE_PROJECT.SimpleToken.at(TOKEN_ADDR)
+    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
     print(f"Token symbol: {token.symbol()}")
 
     #deploy vesting wallet
     print("Deploy vesting wallet...")
     start_timestamp = chain[-1].timestamp + 5  # magic number
     vesting_wallet = BROWNIE_PROJECT.VestingWallet.deploy(
-        BENEFICIARY, start_timestamp, LOCK_TIME, {"from": from_account}
+        TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account}
     )
+    print(f"Vesting wallet address: {vesting_wallet.address}")
 
     #send tokens to vesting wallet
     print("Fund vesting wallet...")
@@ -150,12 +153,13 @@ def do_mine():
 
     # extract inputs
     assert sys.argv[1] == "mine"
-    BLOCKS = sys.argv[2]
-    TIMEDELTA = sys.argv[3]
+    BLOCKS = int(sys.argv[2])
+    TIMEDELTA = int(sys.argv[3])
 
     print(f"Arguments: BLOCKS={BLOCKS}, TIMEDELTA={TIMEDELTA}")
 
     #brownie setup
+    NETWORK = 'development' #hardcoded bc it's the only one we can force
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
     chain = brownie.network.chain
@@ -171,11 +175,13 @@ def do_release():
     HELP_RELEASE = f"""
     Vesting wallet - request vesting wallet to release funds
 
-    Usage: vw release WALLET_ADDR TOKEN_ADDR
+    Usage: vw release WALLET_ADDR TOKEN_ADDR NETWORK
 
+     WALLET_ADDR -- vesting wallet, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
+     NETWORK -- one of {NETWORKS}
     """
-    if len(sys.argv) not in [4]:
+    if len(sys.argv) not in [5]:
         print(HELP_RELEASE)
         sys.exit(0)
 
@@ -183,8 +189,11 @@ def do_release():
     assert sys.argv[1] == "release"
     WALLET_ADDR = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
+    NETWORK = sys.argv[4]
 
-    print(f"Arguments: WALLET_ADDR={WALLET_ADDR}, TOKEN_ADDR={TOKEN_ADDR}")
+    print(f"Arguments: WALLET_ADDR={WALLET_ADDR}, TOKEN_ADDR={TOKEN_ADDR}"
+          f", NETWORK={NETWORK}"
+    )
 
     #brownie setup
     brownie.network.connect(NETWORK) 

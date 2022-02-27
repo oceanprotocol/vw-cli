@@ -104,9 +104,26 @@ Transaction sent: 0x3f113379b70d00041068b27733c37c2977354d8c70cb0b30b0af3087fca9
 
 # Usage: VestingWallet CLI
 
-This is the main way to interface, including for production.
+`vw` the command-line interface.
 
-`vw` is the command-line interface. From the terminal:
+It needs a chain to persist between commands: either a remote chain, or a _separate_ local process (vs one auto-started for each command). To run a local chain, open a _new_ terminal and:
+```console
+ganache-cli 
+```
+
+It will output:
+```text
+Ganache CLI v6.12.2 (ganache-core: 2.13.2)
+
+Available Accounts
+==================
+(0) 0xd9870D9E8A19Aa6f4284955BAb1d9C61f2275da3 (100 ETH)
+...
+
+Listening on 127.0.0.1:8545
+```
+
+Then, in the main terminal:
 ```console
 #add pwd to bash path
 export PATH=$PATH:.

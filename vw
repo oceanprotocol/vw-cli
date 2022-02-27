@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import csv
 import os
 import sys
 
@@ -64,37 +65,9 @@ Usage: vw fund NETWORK TOKEN_ADDR LOCK_TIME AMT TO_ADDR
         f"Arguments: NETWORK={NETWORK}, TOKEN_ADDR={TOKEN_ADDR}"
         f", LOCK_TIME={LOCK_TIME}, AMT={AMT}, TO_ADDR={TO_ADDR}"
     )
-
-    #error handling
-    if NETWORK not in NETWORKS:
-        print(f"Unknown network '{NETWORK}', exiting.")
-        sys.exit(0)
-
-    #brownie setup
+    
     brownie.network.connect(NETWORK) 
-    accounts = brownie.network.accounts
-    chain = brownie.network.chain
-
-    #
-    from_account = _getPrivateAccount()
-
-    #grab token
-    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
-    print(f"Token symbol: {token.symbol()}")
-
-    #deploy vesting wallet
-    print("Deploy vesting wallet...")
-    start_timestamp = chain[-1].timestamp + 5  # magic number
-    vesting_wallet = BROWNIE_PROJECT.VestingWallet.deploy(
-        TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account}
-    )
-
-    #send tokens to vesting wallet
-    print("Fund vesting wallet...")
-    token.transfer(vesting_wallet, toBase18(AMT), {"from": from_account})
-
-    print(f"Done. Vesting wallet address: {vesting_wallet.address}")
-
+    _create_and_fund_vesting_wallet(NETWORK, TOKEN_ADDR, LOCK_TIME, AMT, TO_ADDR)
     
 # ========================================================================
 def do_batch():
@@ -123,16 +96,51 @@ Usage: vw batch NETWORK TOKEN_ADDR LOCK_TIME CSV
         f", LOCK_TIME={LOCK_TIME}, CSV={CSV}"
     )
 
-    import csv
+    brownie.network.connect(NETWORK)
+    TO_ADDRs, VWs = [], []
     with open(CSV, 'r') as csv_file:
         reader = csv.reader(csv_file)
         for row in reader:
             (AMT, TO_ADDR) = row
             print(f"call vw fund for TO_ADDR: {TO_ADDR[:5]}..")
-            os.system(
-                f"vw fund {NETWORK} {TOKEN_ADDR} {LOCK_TIME} {AMT} {TO_ADDR}")
+            
+            VW = _create_and_fund_vesting_wallet(
+                NETWORK, TOKEN_ADDR, LOCK_TIME, float(AMT), TO_ADDR.strip())
+            TO_ADDRs.append(TO_ADDR)
+            VWs.append(VW)
+            
+    print(f"Done batch. TO_ADDR --> WALLET_ADDR:")
+    for (TO_ADDR, VW) in zip(TO_ADDRs, VWs):
+        print(f"{TO_ADDR} --> {VW.address}")
+
+def _create_and_fund_vesting_wallet(NETWORK, TOKEN_ADDR, LOCK_TIME, AMT, TO_ADDR):
+    """helper to do_fund() and do_batch()"""
     
-    print(f"Done batch.")
+    #brownie setup
+    accounts = brownie.network.accounts
+    chain = brownie.network.chain
+
+    #
+    from_account = _getPrivateAccount()
+
+    #grab token
+    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+    print(f"Token symbol: {token.symbol()}")
+
+    #deploy vesting wallet
+    print("Deploy vesting wallet...")
+    start_timestamp = chain[-1].timestamp + 5  # magic number
+    vesting_wallet = BROWNIE_PROJECT.VestingWallet.deploy(
+        TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account}
+    )
+
+    #send tokens to vesting wallet
+    print("Fund vesting wallet...")
+    token.transfer(vesting_wallet, toBase18(AMT), {"from": from_account})
+
+    print(f"Done. Vesting wallet address: {vesting_wallet.address}")
+
+    return vesting_wallet
 
 
 # ========================================================================
@@ -186,11 +194,6 @@ NETWORK -- one of {NETWORKS}"""
     NETWORK = sys.argv[2]
 
     print(f"Arguments: NETWORK={NETWORK}")
-
-    #error handling
-    if NETWORK not in NETWORKS:
-        print(f"Unknown network '{NETWORK}', exiting.")
-        sys.exit(0)
 
     #brownie setup
     brownie.network.connect(NETWORK) 

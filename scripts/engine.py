@@ -10,10 +10,11 @@ def run(runresult_csv:str):
 
     #SimEngine already logs: Tick, Second, Min, Hour, Day, Month, Year
     #So we log other things...
+    g_OCEAN, g_USD = 10.0, 20.0 
 
-    s += ["; granter OCEAN=%s, USD=%s" % (g.OCEAN(), g.USD())]
+    s += ["; granter OCEAN=%s, USD=%s" % (g_OCEAN, g_USD)]
     dataheader += ["granter_OCEAN", "granter_USD"]
-    datarow += [g.OCEAN(), g.USD()]
+    datarow += [g_OCEAN, g_USD]
 
     #done
     return s, dataheader, datarow

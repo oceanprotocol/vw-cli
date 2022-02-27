@@ -77,13 +77,13 @@ def do_fund():
     HELP_FUND = f"""
     Vesting wallet - send funds with vesting wallet
 
-    Usage: vw fund AMT TOKEN_ADDR LOCK_TIME TO_ADDR NETWORK
+    Usage: vw fund NETWORK AMT TOKEN_ADDR LOCK_TIME TO_ADDR
 
+     NETWORK -- one of {NETWORKS}
      AMT -- e.g. '1000' (base-18, not wei)
      TOKEN_ADDR -- address of token being sent. Eg 0x967da4048cd07ab37855c090aaf366e4ce1b9f48 for OCEAN on eth mainnet
      LOCK_TIME -- Eg '10' (10 seconds) or '63113852' (2 years)
      TO_ADDR -- address of beneficiary
-     NETWORK -- one of {NETWORKS}
     """
 
     if len(sys.argv) not in [7]:
@@ -92,14 +92,14 @@ def do_fund():
 
     # extract inputs
     assert sys.argv[1] == "fund"
-    AMT = float(sys.argv[2])
-    TOKEN_ADDR = sys.argv[3]
-    LOCK_TIME = int(sys.argv[4])
-    TO_ADDR = sys.argv[5]
-    NETWORK = sys.argv[6]
+    NETWORK = sys.argv[2]
+    AMT = float(sys.argv[3])
+    TOKEN_ADDR = sys.argv[4]
+    LOCK_TIME = int(sys.argv[5])
+    TO_ADDR = sys.argv[6]
     print(
-        f"Arguments: AMT={AMT}, TOKEN_ADDR={TOKEN_ADDR}"
-        f", LOCK_TIME={LOCK_TIME}, TO_ADDR={TO_ADDR}, NETWORK={NETWORK}"
+        f"Arguments: NETWORK={NETWORK}, AMT={AMT}, TOKEN_ADDR={TOKEN_ADDR}"
+        f", LOCK_TIME={LOCK_TIME}, TO_ADDR={TO_ADDR}"
     )
 
     #error handling
@@ -170,11 +170,11 @@ def do_release():
     HELP_RELEASE = f"""
     Vesting wallet - request vesting wallet to release funds
 
-    Usage: vw release WALLET_ADDR TOKEN_ADDR NETWORK
+    Usage: vw release NETWORK WALLET_ADDR TOKEN_ADDR
 
+     NETWORK -- one of {NETWORKS}
      WALLET_ADDR -- vesting wallet, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
-     NETWORK -- one of {NETWORKS}
     """
     if len(sys.argv) not in [5]:
         print(HELP_RELEASE)
@@ -182,12 +182,12 @@ def do_release():
 
     # extract inputs
     assert sys.argv[1] == "release"
-    WALLET_ADDR = sys.argv[2]
-    TOKEN_ADDR = sys.argv[3]
-    NETWORK = sys.argv[4]
+    NETWORK = sys.argv[2]
+    WALLET_ADDR = sys.argv[3]
+    TOKEN_ADDR = sys.argv[4]
 
-    print(f"Arguments: WALLET_ADDR={WALLET_ADDR}, TOKEN_ADDR={TOKEN_ADDR}"
-          f", NETWORK={NETWORK}"
+    print(f"Arguments: NETWORK={NETWORK}, WALLET_ADDR={WALLET_ADDR}"
+          f", TOKEN_ADDR={TOKEN_ADDR}"
     )
 
     #brownie setup
@@ -207,11 +207,11 @@ def do_balance():
     HELP_BALANCE = f"""
     Vesting wallet - see balance of a token for an account  
 
-    Usage: vw balance TOKEN_ADDR ACCOUNT_ADDR NETWORK
+    Usage: vw balance NETWORK TOKEN_ADDR ACCOUNT_ADDR
 
+     NETWORK -- one of {NETWORKS}
      ACCOUNT_ADDR -- account address, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
-     NETWORK -- one of {NETWORKS}
     """
     if len(sys.argv) not in [5]:
         print(HELP_BALANCE)
@@ -219,12 +219,12 @@ def do_balance():
 
     # extract inputs
     assert sys.argv[1] == "balance"
-    TOKEN_ADDR = sys.argv[2]
-    ACCOUNT_ADDR = sys.argv[3]
-    NETWORK = sys.argv[4]
+    NETWORK = sys.argv[2]
+    TOKEN_ADDR = sys.argv[3]
+    ACCOUNT_ADDR = sys.argv[4]
 
-    print(f"Arguments: TOKEN_ADDR={TOKEN_ADDR} ACCOUNT_ADDR={ACCOUNT_ADDR}, "
-          f", NETWORK={NETWORK}"
+    print(f"Arguments: NETWORK={NETWORK}, TOKEN_ADDR={TOKEN_ADDR}"
+          f", ACCOUNT_ADDR={ACCOUNT_ADDR}"
     )
 
     #brownie setup

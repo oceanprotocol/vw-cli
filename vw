@@ -237,7 +237,7 @@ def show_balance():
     print(f"  balance of token : {token.balanceOf(ACCOUNT_ADDR)} {token.symbol()}")
 
 # ========================================================================
-def show_released():
+def show_walletinfo():
     HELP_WALLETINFO = f"""
     Vesting wallet - show info about a vesting wallet
 
@@ -297,7 +297,7 @@ def do_main():
     elif sys.argv[1] == "accountinfo":
         show_balance()
     elif sys.argv[1] == "walletinfo":
-        show_released()
+        show_walletinfo()
     else:
         show_help()
 

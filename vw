@@ -15,7 +15,7 @@ NETWORKS = ['development', 'eth_mainnet'] #development = ganache
 HELP_MAIN = """
 Vesting wallet main help
 
-Usage: vw help|token|fund|wait|release
+Usage: vw help|token|fund|mine|release
 
   vw help - this message
   vw token - create token, for testing
@@ -69,13 +69,7 @@ def do_token():
     token = BROWNIE_PROJECT.Simpletoken.deploy(
         "TST", "Test Token", 18, 1e21, {"from": from_account}
     )
-    print("Token deployed:")
-    print(f"  symbol: {token.symbol()}")
-    print(f"  name: {token.name()}")
-    print(f"  address: {token.address}")
-    print(f"  totalSupply: {token.totalSupply()}")
-    print(f"  deployer balance: {token.balanceOf(from_account)}")
-    print("Done.")
+    print(f"Token '{token.symbol()}' deployed at address: {token.address}")
     
 # ========================================================================
 def do_fund():

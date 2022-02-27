@@ -63,7 +63,6 @@ def do_token():
     #brownie setup
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
-    chain = brownie.network.chain
     from_account = accounts[0] #FIXME for non-ganache
 
     #deploy wallet
@@ -193,7 +192,6 @@ def do_release():
     #brownie setup
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
-    chain = brownie.network.chain
     from_account = accounts[0] #FIXME for non-ganache
 
     #release the token
@@ -230,7 +228,6 @@ def do_balance():
     #brownie setup
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
-    chain = brownie.network.chain
 
     #release the token
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)

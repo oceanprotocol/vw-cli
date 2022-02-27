@@ -27,6 +27,7 @@ Usage: vw fund|release|..
   vw walletinfo - info about a vesting wallet
 
   vw help - this message
+  vw help2 - test recursive calls
 
 Transactions are signed with envvar 'VW_KEY`.
 
@@ -286,6 +287,12 @@ def show_walletinfo():
     print(f"  amt vested: {fromBase18(amt_vested)} {token.symbol()}")
     print(f"  amt released: {fromBase18(amt_released)} {token.symbol()}")
 
+
+# ========================================================================
+def show_help2(): #demonstrate recursive calls
+    print("help2!!")
+    os.system("vw")
+    
 # ========================================================================
 def _getPrivateAccount():
     private_key = os.getenv('VW_KEY')
@@ -314,6 +321,8 @@ def do_main():
         show_accountinfo()
     elif sys.argv[1] == "walletinfo":
         show_walletinfo()
+    elif sys.argv[1] == "help2":
+        show_help2()
     else:
         show_help()
 

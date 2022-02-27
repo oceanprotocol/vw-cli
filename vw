@@ -79,7 +79,7 @@ def do_fund():
     HELP_FUND = f"""
     Vesting wallet - send funds with vesting wallet
 
-    Usage: vw fund NETWORK AMT TOKEN_ADDR LOCK_TIME TO_ADDR
+    Usage: vw fund NETWORK TOKEN_ADDR AMT LOCK_TIME TO_ADDR
 
      NETWORK -- one of {NETWORKS}
      AMT -- e.g. '1000' (base-18, not wei)
@@ -95,12 +95,12 @@ def do_fund():
     # extract inputs
     assert sys.argv[1] == "fund"
     NETWORK = sys.argv[2]
-    AMT = float(sys.argv[3])
-    TOKEN_ADDR = sys.argv[4]
+    TOKEN_ADDR = sys.argv[3]
+    AMT = float(sys.argv[4])
     LOCK_TIME = int(sys.argv[5])
     TO_ADDR = sys.argv[6]
     print(
-        f"Arguments: NETWORK={NETWORK}, AMT={AMT}, TOKEN_ADDR={TOKEN_ADDR}"
+        f"Arguments: NETWORK={NETWORK}, TOKEN_ADDR={TOKEN_ADDR}, AMT={AMT}"
         f", LOCK_TIME={LOCK_TIME}, TO_ADDR={TO_ADDR}"
     )
 
@@ -125,13 +125,12 @@ def do_fund():
     vesting_wallet = BROWNIE_PROJECT.VestingWallet.deploy(
         TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account}
     )
-    print(f"Vesting wallet address: {vesting_wallet.address}")
 
     #send tokens to vesting wallet
     print("Fund vesting wallet...")
     token.transfer(vesting_wallet, toBase18(AMT), {"from": from_account})
 
-    print("Done.")
+    print(f"Done. Vesting wallet address: {vesting_wallet.address}")
 
 
 # ========================================================================
@@ -172,11 +171,11 @@ def do_release():
     HELP_RELEASE = f"""
     Vesting wallet - request vesting wallet to release funds
 
-    Usage: vw release NETWORK WALLET_ADDR TOKEN_ADDR
+    Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
 
      NETWORK -- one of {NETWORKS}
-     WALLET_ADDR -- vesting wallet, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
+     WALLET_ADDR -- vesting wallet, e.g. '0x987...'
     """
     if len(sys.argv) not in [5]:
         print(HELP_RELEASE)
@@ -185,11 +184,11 @@ def do_release():
     # extract inputs
     assert sys.argv[1] == "release"
     NETWORK = sys.argv[2]
-    WALLET_ADDR = sys.argv[3]
-    TOKEN_ADDR = sys.argv[4]
+    TOKEN_ADDR = sys.argv[3]
+    WALLET_ADDR = sys.argv[4]
 
-    print(f"Arguments: NETWORK={NETWORK}, WALLET_ADDR={WALLET_ADDR}"
-          f", TOKEN_ADDR={TOKEN_ADDR}"
+    print(f"Arguments: NETWORK={NETWORK}, TOKEN_ADDR={TOKEN_ADDR}"
+          f", WALLET_ADDR={WALLET_ADDR}"
     )
 
     #brownie setup
@@ -211,8 +210,8 @@ def show_accountinfo():
     Usage: vw accountinfo NETWORK TOKEN_ADDR ACCOUNT_ADDR
 
      NETWORK -- one of {NETWORKS}
-     ACCOUNT_ADDR -- account address, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
+     ACCOUNT_ADDR -- account address, e.g. '0x987...'
     """
     if len(sys.argv) not in [5]:
         print(HELP_ACCOUNTINFO)
@@ -233,8 +232,9 @@ def show_accountinfo():
 
     #release the token
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+    balance = token.balanceOf(ACCOUNT_ADDR)
     print(f"For account {ACCOUNT_ADDR[:5]}.., token '{token.symbol()}':")
-    print(f"  balance of token : {token.balanceOf(ACCOUNT_ADDR)} {token.symbol()}")
+    print(f"  balance of token : {fromBase18(balance)} {token.symbol()}")
 
 # ========================================================================
 def show_walletinfo():

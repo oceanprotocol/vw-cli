@@ -49,6 +49,25 @@ Generating build data...
 Project has been compiled. Build artifacts saved at /home/trentmc/code/scheduler/build/contracts
  ```
 
+# Usage: Running Scheduler Script
+
+In terminal:
+```console
+./run_vesting_wallet.py
+```
+
+
+# Usage: Running Tests
+
+In terminal:
+```console
+#run tests
+brownie test
+```
+
+----
+
+Note: from here on, we show usage in brownie console, py console, etc. While the examples are on (stripped-down) Ocean datatokens, they can be adapted for scheduler too.
 
 # Usage: Brownie Console
 
@@ -89,13 +108,6 @@ dt = ocean.createDatatoken('blob_str')
 print(dt.address)
 ```
 
-# Usage: Running Tests
-
-In terminal:
-```console
-#run tests
-brownie test
-```
 
 # Usage: Running Datatoken Script
 
@@ -121,15 +133,4 @@ Transaction sent: 0x6640df70ee894b36d22a1cb07a882311fad0d44da581c7dcaa838a75f07c
   Datatoken.transfer confirmed   Block: 2   Gas used: 50599 (0.75%)
 
 Terminating local RPC client...
-```
-
-# Usage: Running Scheduler Script
-
-In terminal:
-```console
-#run script
-export OCEAN_PRIVATE_KEY1=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b7
-export OCEAN_PRIVATE_KEY2=cd9ecbe21eb30b7d9dd2808024b4f0da5876e7c7216b28ab6ecb0ccd1d4c76b8
-./scripts/scheduler run
-./scripts/scheduler plot
 ```

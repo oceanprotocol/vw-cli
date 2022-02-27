@@ -61,42 +61,7 @@ Generating build data...
 Project has been compiled. Build artifacts saved at ..
  ```
 
-# VestingWallet CLI
-
-`vw` is the command-line interface. From the terminal:
-```console
-#add pwd to bash path
-export PATH=$PATH:.
-
-#see vw help
-vw
-```
-
-You will see something like:
-```text
-Vesting wallet main help
-
-Usage: vw help|token|fund|wait|release
-
-  vw help - this message
-  vw token - create token, for testing
-  vw fund - send funds with vesting wallet
-  vw mine - force chain to pass time (ganache only)
-  vw release - request vesting wallet to release funds
-
-Typical usage flows:
-  Run on ganache: token -> fund -> mine -> release
-  Run on testnet w test token: token -> fund -> (wait) -> release
-  Run on testnet w existing token: fund -> (wait) -> release
-  Run on mainnet w test token: token -> fund -> (wait) -> release
-  Run on mainnet w existing token: fund -> (wait) -> release
-```
-
-Then, use it accordingly:)
-
-# Usage: Running Basic Script
-
-(More for testing)
+# Usage: try simple script
 
 In terminal:
 ```console
@@ -135,3 +100,39 @@ Transaction sent: 0x3f113379b70d00041068b27733c37c2977354d8c70cb0b30b0af3087fca9
 >>> t.symbol()                                                                                                                                                                                              
 'TEST'
 ```
+
+
+# Usage: VestingWallet CLI
+
+This is the main way to interface, including for production.
+
+`vw` is the command-line interface. From the terminal:
+```console
+#add pwd to bash path
+export PATH=$PATH:.
+
+#see vw help
+vw
+```
+
+You will see something like:
+```text
+Vesting wallet main help
+
+Usage: vw help|token|fund|wait|release
+
+  vw help - this message
+  vw token - create token, for testing
+  vw fund - send funds with vesting wallet
+  vw mine - force chain to pass time (ganache only)
+  vw release - request vesting wallet to release funds
+
+Typical usage flows:
+  Run on ganache: token -> fund -> mine -> release
+  Run on testnet w test token: token -> fund -> (wait) -> release
+  Run on testnet w existing token: fund -> (wait) -> release
+  Run on mainnet w test token: token -> fund -> (wait) -> release
+  Run on mainnet w existing token: fund -> (wait) -> release
+```
+
+Then, use it accordingly:)

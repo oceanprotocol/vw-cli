@@ -47,9 +47,8 @@ def do_token():
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "vw"
-    assert sys.argv[2] == "token"
-    NETWORK = sys.argv[3]
+    assert sys.argv[1] == "token"
+    NETWORK = sys.argv[2]
 
     print(f"Arguments: NETWORK={NETWORK}")
 
@@ -71,6 +70,7 @@ def do_token():
     print("Token deployed:")
     print(f"  symbol: {token.symbol()}")
     print(f"  name: {token.name()}")
+    print(f"  address: {token.address}")
     print(f"  totalSupply: {token.totalSupply()}")
     print(f"  deployer balance: {token.balanceOf(from_account)}")
     print("Done.")
@@ -94,13 +94,12 @@ def do_fund():
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "vw"
-    assert sys.argv[2] == "fund"
-    AMT = float(sys.argv[3])
-    TOKEN_ADDR = sys.argv[4]
-    LOCK_TIME = int(sys.argv[5])
-    TO_ADDR = sys.argv[6]
-    NETWORK = sys.argv[7]
+    assert sys.argv[1] == "fund"
+    AMT = float(sys.argv[2])
+    TOKEN_ADDR = sys.argv[3]
+    LOCK_TIME = int(sys.argv[4])
+    TO_ADDR = sys.argv[5]
+    NETWORK = sys.argv[6]
     print(
         f"Arguments: AMT={AMT}, TOKEN_ADDR={TOKEN_ADDR}, "
         f", LOCK_TIME={LOCK_TIME}, TO_ADDR={TO_ADDR}, NETWORK={NETWORK}"
@@ -150,10 +149,9 @@ def do_mine():
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "vw"
-    assert sys.argv[2] == "mine"
-    BLOCKS = sys.argv[3]
-    TIMEDELTA = sys.argv[4]
+    assert sys.argv[1] == "mine"
+    BLOCKS = sys.argv[2]
+    TIMEDELTA = sys.argv[3]
 
     print(f"Arguments: BLOCKS={BLOCKS}, TIMEDELTA={TIMEDELTA}")
 
@@ -182,10 +180,9 @@ def do_release():
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "vw"
-    assert sys.argv[2] == "release"
-    WALLET_ADDR = sys.argv[3]
-    TOKEN_ADDR = sys.argv[4]
+    assert sys.argv[1] == "release"
+    WALLET_ADDR = sys.argv[2]
+    TOKEN_ADDR = sys.argv[3]
 
     print(f"Arguments: WALLET_ADDR={WALLET_ADDR}, TOKEN_ADDR={TOKEN_ADDR}")
 

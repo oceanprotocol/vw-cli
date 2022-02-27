@@ -24,8 +24,8 @@ Usage: vw help|token|..
   vw mine - force chain to pass time (ganache only)
   vw release - request vesting wallet to release funds
 
-  vw showbalance - view a token balance
-  vw walletinfo - show info about a token and wallet
+  vw accountinfo - info about an account
+  vw walletinfo - info about a vesting wallet
 
 Typical usage flows:
   Run on ganache: token -> fund -> mine -> release
@@ -205,21 +205,21 @@ def do_release():
 
 # ========================================================================
 def show_balance():
-    HELP_SHOWBALANCE = f"""
-    Vesting wallet - see balance of a token for an account  
+    HELP_ACCOUNTINFO = f"""
+    Vesting wallet - info about an account
 
-    Usage: vw showbalance NETWORK TOKEN_ADDR ACCOUNT_ADDR
+    Usage: vw accountinfo NETWORK TOKEN_ADDR ACCOUNT_ADDR
 
      NETWORK -- one of {NETWORKS}
      ACCOUNT_ADDR -- account address, e.g. '0x987...'
      TOKEN_ADDR -- e.g. '0x123..'
     """
     if len(sys.argv) not in [5]:
-        print(HELP_SHOWBALANCE)
+        print(HELP_ACCOUNTINFO)
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "showbalance"
+    assert sys.argv[1] == "accountinfo"
     NETWORK = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
     ACCOUNT_ADDR = sys.argv[4]
@@ -233,12 +233,13 @@ def show_balance():
 
     #release the token
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
-    print(f"Balance of token '{token.symbol()}' at address {ACCOUNT_ADDR[:5]}..: {token.balanceOf(ACCOUNT_ADDR)}")
+    print(f"For account {ACCOUNT_ADDR[:5]}.., token '{token.symbol()}':")
+    print(f"  balance of token : {token.balanceOf(ACCOUNT_ADDR)} {token.symbol()}")
 
 # ========================================================================
 def show_released():
     HELP_WALLETINFO = f"""
-    Vesting wallet - show info about a token and wallet
+    Vesting wallet - show info about a vesting wallet
 
     Usage: vw walletinfo NETWORK TOKEN_ADDR WALLET_ADDR
 
@@ -269,9 +270,12 @@ def show_released():
     wallet = BROWNIE_PROJECT.VestingWallet.at(WALLET_ADDR)
     amt_vested = wallet.vestedAmount(token.address, chain[-1].timestamp)
     amt_released = wallet.released(token.address)
-    print(f"For wallet {WALLET_ADDR[:5]}.., token '{token.symbol()}':")
-    print(f"  amt vested: {fromBase18(amt_vested)}")
-    print(f"  amt released: {fromBase18(amt_released)}")
+    print(f"For vesting wallet {WALLET_ADDR[:5]}.., token '{token.symbol()}':")
+    print(f"  beneficiary: {wallet.beneficiary()[:5]}..")
+    print(f"  start: {wallet.start()} (compare to current chain time of {chain[-1].timestamp})")
+    print(f"  duration: {wallet.duration()} s")
+    print(f"  amt vested: {fromBase18(amt_vested)} {token.symbol()}")
+    print(f"  amt released: {fromBase18(amt_released)} {token.symbol()}")
     
 # ========================================================================
 # main
@@ -290,7 +294,7 @@ def do_main():
         do_release()
 
     #read actions
-    elif sys.argv[1] == "showbalance":
+    elif sys.argv[1] == "accountinfo":
         show_balance()
     elif sys.argv[1] == "walletinfo":
         show_released()

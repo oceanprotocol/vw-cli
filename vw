@@ -5,7 +5,7 @@ import sys
 
 import brownie
 
-from util.base18 import toBase18
+from util.base18 import toBase18, fromBase18
 
 BROWNIE_PROJECT = brownie.project.load("./", name="MyProject")
 
@@ -15,14 +15,17 @@ NETWORKS = ['development', 'eth_mainnet'] #development = ganache
 HELP_MAIN = """
 Vesting wallet main help
 
-Usage: vw help|token|fund|mine|release|balance
+Usage: vw help|token|..
 
   vw help - this message
+
   vw token - create token, for testing
   vw fund - send funds with vesting wallet
   vw mine - force chain to pass time (ganache only)
   vw release - request vesting wallet to release funds
-  vw balance - view a token balance 
+
+  vw showbalance - view a token balance
+  vw showreleased - for a token and wallet, show amount already released
 
 Typical usage flows:
   Run on ganache: token -> fund -> mine -> release
@@ -226,18 +229,53 @@ def show_balance():
     )
 
     #brownie setup
-    brownie.network.connect(NETWORK) 
-    accounts = brownie.network.accounts
+    brownie.network.connect(NETWORK)
 
     #release the token
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
     print(f"Balance of token '{token.symbol()}' at address {ACCOUNT_ADDR[:5]}..: {token.balanceOf(ACCOUNT_ADDR)}")
+
+# ========================================================================
+def show_released():
+    HELP_SHOWRELEASED = f"""
+    Vesting wallet - for a token and wallet, show amount already released
+
+    Usage: vw showreleased NETWORK TOKEN_ADDR WALLET_ADDR
+
+     NETWORK -- one of {NETWORKS}
+     TOKEN_ADDR -- e.g. '0x123..'
+     WALLET_ADDR -- vesting wallet address
+    """
+    if len(sys.argv) not in [5]:
+        print(HELP_SHOWRELEASED)
+        sys.exit(0)
+
+    # extract inputs
+    assert sys.argv[1] == "showreleased"
+    NETWORK = sys.argv[2]
+    TOKEN_ADDR = sys.argv[3]
+    WALLET_ADDR = sys.argv[4]
+
+    print(f"Arguments: NETWORK={NETWORK}, TOKEN_ADDR={TOKEN_ADDR}"
+          f", WALLET_ADDR={WALLET_ADDR}"
+    )
+
+    #brownie setup
+    brownie.network.connect(NETWORK)
+
+    #release the token
+    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+    wallet = BROWNIE_PROJECT.VestingWallet.at(WALLET_ADDR)
+    print(f"For wallet {WALLET_ADDR[:5]}.., token '{token.symbol()}', {fromBase18(wallet.released(TOKEN_ADDR))} of the token has been released")
+    
     
 # ========================================================================
 # main
 def do_main():
     if len(sys.argv) == 1 or sys.argv[1] == "help":
         show_help()
+
+    #write actions
     elif sys.argv[1] == "token":
         do_token()
     elif sys.argv[1] == "fund":
@@ -246,8 +284,12 @@ def do_main():
         do_mine()
     elif sys.argv[1] == "release":
         do_release()
+
+    #read actions
     elif sys.argv[1] == "showbalance":
         show_balance()
+    elif sys.argv[1] == "showreleased":
+        show_released()
     else:
         show_help()
 

@@ -53,7 +53,7 @@ Project has been compiled. Build artifacts saved at /home/trentmc/code/scheduler
 
 In terminal:
 ```console
-./run_vesting_wallet.py
+./scripts/run_vesting_wallet.py
 ```
 
 

@@ -25,7 +25,7 @@ Usage: vw help|token|..
   vw release - request vesting wallet to release funds
 
   vw showbalance - view a token balance
-  vw showreleased - for a token and wallet, show amount already released
+  vw walletinfo - show info about a token and wallet
 
 Typical usage flows:
   Run on ganache: token -> fund -> mine -> release
@@ -237,21 +237,21 @@ def show_balance():
 
 # ========================================================================
 def show_released():
-    HELP_SHOWRELEASED = f"""
-    Vesting wallet - for a token and wallet, show amount already released
+    HELP_WALLETINFO = f"""
+    Vesting wallet - show info about a token and wallet
 
-    Usage: vw showreleased NETWORK TOKEN_ADDR WALLET_ADDR
+    Usage: vw walletinfo NETWORK TOKEN_ADDR WALLET_ADDR
 
      NETWORK -- one of {NETWORKS}
      TOKEN_ADDR -- e.g. '0x123..'
      WALLET_ADDR -- vesting wallet address
     """
     if len(sys.argv) not in [5]:
-        print(HELP_SHOWRELEASED)
+        print(HELP_WALLETINFO)
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "showreleased"
+    assert sys.argv[1] == "walletinfo"
     NETWORK = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
     WALLET_ADDR = sys.argv[4]
@@ -292,7 +292,7 @@ def do_main():
     #read actions
     elif sys.argv[1] == "showbalance":
         show_balance()
-    elif sys.argv[1] == "showreleased":
+    elif sys.argv[1] == "walletinfo":
         show_released()
     else:
         show_help()

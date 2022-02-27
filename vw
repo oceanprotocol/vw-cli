@@ -13,7 +13,7 @@ NETWORKS = ['development', 'eth_mainnet'] #development = ganache
 
 # ========================================================================
 HELP_MAIN = """
-Vesting wallet main help
+Vesting wallet - main help
 
 Usage: vw fund|release|..
 
@@ -27,6 +27,8 @@ Usage: vw fund|release|..
   vw walletinfo - info about a vesting wallet
 
   vw help - this message
+
+Transactions are signed with envvar 'VW_KEY`.
 
 Production flow:
   Run on mainnet w existing token: fund -> (wait) -> release
@@ -69,7 +71,9 @@ def do_token():
     #brownie setup
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
-    from_account = accounts[0] #FIXME for non-ganache
+
+    #
+    from_account = _getPrivateAccount()
 
     #deploy wallet
     token = BROWNIE_PROJECT.Simpletoken.deploy(
@@ -85,8 +89,8 @@ def do_fund():
     Usage: vw fund NETWORK TOKEN_ADDR AMT LOCK_TIME TO_ADDR
 
      NETWORK -- one of {NETWORKS}
-     AMT -- e.g. '1000' (base-18, not wei)
      TOKEN_ADDR -- address of token being sent. Eg 0x967da4048cd07ab37855c090aaf366e4ce1b9f48 for OCEAN on eth mainnet
+     AMT -- e.g. '1000' (base-18, not wei)
      LOCK_TIME -- Eg '10' (10 seconds) or '63113852' (2 years)
      TO_ADDR -- address of beneficiary
     """
@@ -116,7 +120,9 @@ def do_fund():
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
     chain = brownie.network.chain
-    from_account = accounts[0] #FIXME for non-ganache
+
+    #
+    from_account = _getPrivateAccount()
 
     #grab token
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
@@ -162,7 +168,7 @@ def do_mine():
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
     chain = brownie.network.chain
-    from_account = accounts[0] #FIXME for non-ganache
+    from_account = _getPrivateAccount()
 
     #make time pass
     chain.mine(blocks=BLOCKS, timedelta=TIMEDELTA)
@@ -197,7 +203,7 @@ def do_release():
     #brownie setup
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
-    from_account = accounts[0] #FIXME for non-ganache
+    from_account = _getPrivateAccount()
 
     #release the token
     vesting_wallet = BROWNIE_PROJECT.VestingWallet.at(WALLET_ADDR)
@@ -279,7 +285,14 @@ def show_walletinfo():
     print(f"  duration: {wallet.duration()} s")
     print(f"  amt vested: {fromBase18(amt_vested)} {token.symbol()}")
     print(f"  amt released: {fromBase18(amt_released)} {token.symbol()}")
-    
+
+# ========================================================================
+def _getPrivateAccount():
+    private_key = os.getenv('VW_KEY')
+    account = brownie.network.accounts.add(private_key=private_key)
+    print(f"For private key VW_KEY, address is: {account.address}")
+    return account
+
 # ========================================================================
 # main
 def do_main():

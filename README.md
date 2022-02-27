@@ -143,4 +143,3 @@ Usage: vw fund|release|..
   ...
 ```
 
-Then, use it accordingly:)

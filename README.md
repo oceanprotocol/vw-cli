@@ -1,28 +1,31 @@
 # Vesting Wallet
 
+# Prerequisites
+
+- Linux/MacOS
+- Python 3.8.5+
+- solc 0.8.0+ [[Instructions](https://docs.soliditylang.org/en/v0.8.9/installing-solidity.html)]
+- ganache. To install: `npm install ganache-cli --global`
+
 # Installation
 
 Open a new terminal and:
 
 ```console
-#install Ganache (if you haven't yet)
-npm install ganache-cli --global
-
 #clone repo
 git clone https://github.com/trentmc/vesting_wallet.git
 cd vesting_wallet
 
 #create a virtual environment
-python3 -m venv venv
+python -m venv venv
 
 #activate env
 source venv/bin/activate
 
-#install dependencies. Install wheel first to avoid errors.
-pip install wheel
+#install dependencies
 pip install -r requirements.txt
 
-#install openzeppelin library, to import from .sol files
+#install openzeppelin library, to import from .sol (ignore FileExistsErrors)
 brownie pm install OpenZeppelin/openzeppelin-contracts@4.0.0
 ```
 
@@ -35,7 +38,7 @@ brownie compile
 
 It should output:
 ```text
-Brownie v1.17.1 - Python development framework for Ethereum
+Brownie v1.18.1 - Python development framework for Ethereum
 
 Compiling contracts...
   Solc version: 0.8.10
@@ -43,10 +46,19 @@ Compiling contracts...
   EVM Version: Istanbul
 Generating build data...
  - OpenZeppelin/openzeppelin-contracts@4.0.0/IERC20
- ...
+...
  - VestingWallet
- 
-Project has been compiled. Build artifacts saved at /home/trentmc/code/vesting_wallet/build/contracts
+
+Compiling contracts...
+  Solc version: 0.5.17
+  Optimizer: Enabled  Runs: 200
+  EVM Version: Istanbul
+Generating build data...
+ - OpenZeppelin/openzeppelin-contracts@2.1.1/SafeMath
+ - SafeMath
+ - Simpletoken
+
+Project has been compiled. Build artifacts saved at ..
  ```
 
 # VestingWallet CLI

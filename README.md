@@ -35,8 +35,8 @@ Open a new terminal and:
 
 ```console
 #clone repo
-git clone https://github.com/oceanprotocol/VestingWallet-CLI.git vesting_wallet
-cd vesting_wallet
+git clone https://github.com/oceanprotocol/vw-cli.git 
+cd vw-cli
 
 #create a virtual environment
 python -m venv venv

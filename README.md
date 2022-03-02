@@ -165,6 +165,8 @@ Usage: vw fund|release|..
   ...
 ```
 
+**Then, simply follow the usage directions:)**
+
 # License
 
     Copyright ((C)) 2022 Ocean Protocol Foundation

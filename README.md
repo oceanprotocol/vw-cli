@@ -1,5 +1,27 @@
 # Vesting Wallet
 
+CLI for OpenZeppelin [`VestingWallet`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/27f8609ac949fb3a0b24b8194e6ff3eb2dcd0f67/contracts/token/TokenTimelock.sol) contract. 
+
+Main functionality:
+```text
+vw fund - send funds with vesting wallet
+vw batch - batch send funds via vesting wallets
+vw release - request vesting wallet to release funds
+vw token - create token, for testing
+vw mine - force chain to pass time (ganache only)
+vw accountinfo - info about an account
+vw walletinfo - info about a vesting wallet
+```
+
+Other features:
+- Via brownie, easy to interact with contract in console
+- Thorough unit tests
+
+Backlog:
+- CLI currently supports fixed lock time ("cliff of x"); could pull up contract functionality for linear vesting
+- CLI currently supports ERC20; could pull up contract functionality for ETH
+- Installing needs `git clone` etc. Could add to pip, or make it a fully independent tool 
+
 # Prerequisites
 
 - Linux/MacOS

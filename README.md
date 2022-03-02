@@ -35,7 +35,7 @@ Open a new terminal and:
 
 ```console
 #clone repo
-git clone https://github.com/trentmc/vesting_wallet.git
+git clone https://github.com/oceanprotocol/VestingWallet-CLI.git
 cd vesting_wallet
 
 #create a virtual environment

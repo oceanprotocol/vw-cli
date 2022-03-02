@@ -2,7 +2,7 @@
 
 CLI for OpenZeppelin [VestingWallet](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/27f8609ac949fb3a0b24b8194e6ff3eb2dcd0f67/contracts/token/TokenTimelock.sol) contract. 
 
-Main functionality:
+Functionality is via `vw` tool:
 ```text
 vw fund - send funds with vesting wallet
 vw batch - batch send funds via vesting wallets
@@ -17,7 +17,7 @@ Other features:
 - Via brownie, easy to interact with contract in console
 - Thorough unit tests
 
-Backlog:
+Potential future features:
 - CLI currently supports fixed lock time ("cliff of x"); could pull up contract functionality for linear vesting
 - CLI currently supports ERC20; could pull up contract functionality for ETH
 - Usage requires `git clone` etc. Could add to pip, or make it a fully independent tool 
@@ -35,7 +35,7 @@ Open a new terminal and:
 
 ```console
 #clone repo
-git clone https://github.com/oceanprotocol/VestingWallet-CLI.git
+git clone https://github.com/oceanprotocol/VestingWallet-CLI.git vesting_wallet
 cd vesting_wallet
 
 #create a virtual environment
@@ -81,7 +81,7 @@ Generating build data...
  - Simpletoken
 
 Project has been compiled. Build artifacts saved at ..
- ```
+```
 
 # Usage: try simple script
 

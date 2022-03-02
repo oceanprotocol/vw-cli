@@ -22,16 +22,16 @@ Potential future features:
 - CLI currently supports ERC20; could pull up contract functionality for ETH
 - Usage requires `git clone` etc. Could add to pip, or make it a fully independent tool 
 
-# Prerequisites
+# Installation
+
+Ensure pre-requisites:
 
 - Linux/MacOS
 - Python 3.8.5+
 - solc 0.8.0+ [[Instructions](https://docs.soliditylang.org/en/v0.8.9/installing-solidity.html)]
 - ganache. To install: `npm install ganache-cli --global`
 
-# Installation
-
-Open a new terminal and:
+Now, open a new terminal and:
 
 ```console
 #clone repo

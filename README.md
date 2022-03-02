@@ -62,23 +62,8 @@ It should output:
 ```text
 Brownie v1.18.1 - Python development framework for Ethereum
 
-Compiling contracts...
-  Solc version: 0.8.10
-  Optimizer: Enabled  Runs: 200
-  EVM Version: Istanbul
-Generating build data...
- - OpenZeppelin/openzeppelin-contracts@4.0.0/IERC20
+Compiling contracts
 ...
- - VestingWallet
-
-Compiling contracts...
-  Solc version: 0.5.17
-  Optimizer: Enabled  Runs: 200
-  EVM Version: Istanbul
-Generating build data...
- - OpenZeppelin/openzeppelin-contracts@2.1.1/SafeMath
- - SafeMath
- - Simpletoken
 
 Project has been compiled. Build artifacts saved at ..
 ```

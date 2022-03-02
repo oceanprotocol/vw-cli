@@ -1,4 +1,4 @@
-# Vesting Wallet
+# VestingWallet CLI
 
 CLI for OpenZeppelin [`VestingWallet`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/27f8609ac949fb3a0b24b8194e6ff3eb2dcd0f67/contracts/token/TokenTimelock.sol) contract. 
 

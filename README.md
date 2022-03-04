@@ -51,31 +51,33 @@ pip install -r requirements.txt
 brownie pm install OpenZeppelin/openzeppelin-contracts@4.0.0
 ```
 
-# Compiling
+# Main Usage: CLU
 
-From terminal:
+First, compile. From terminal:
 ```console
 brownie compile
 ```
 
-It should output:
-```text
-Brownie v1.18.1 - Python development framework for Ethereum
-
-Compiling contracts
-...
-
-Project has been compiled. Build artifacts saved at ..
+The `vw` CLI needs needs a chain to persist between commands: either a remote chain, or a separate local process (vs one auto-started for each command). To run a local chain, open a new terminal and:
+```
+ganache-cli
 ```
 
-# Usage: try simple script
-
-In terminal:
+Then, in the main terminal:
 ```console
-./scripts/run_vesting_wallet.py
+#add pwd to bash path
+export PATH=$PATH:.
+
+#see vw help
+vw
 ```
 
-# Usage: Running Tests
+**Then, simply follow the usage directions:)**
+
+
+# Other Usage
+
+## Running Tests
 
 In terminal:
 ```console
@@ -89,7 +91,7 @@ brownie test tests/test_Simpletoken.py
 brownie test
 ```
 
-# Usage: Brownie Console
+## Brownie Console
 
 From terminal:
 ```console
@@ -108,49 +110,12 @@ Transaction sent: 0x3f113379b70d00041068b27733c37c2977354d8c70cb0b30b0af3087fca9
 'TEST'
 ```
 
+## Simple Test Script
 
-# Usage: VestingWallet CLI
-
-`vw` is the command-line interface.
-
-It needs a chain to persist between commands: either a remote chain, or a _separate_ local process (vs one auto-started for each command). To run a local chain, open a _new_ terminal and:
+An example of a script. You can add more. From terminal:
 ```console
-ganache-cli 
+./scripts/run_vesting_wallet.py
 ```
-
-It will output:
-```text
-Ganache CLI v6.12.2 (ganache-core: 2.13.2)
-
-Available Accounts
-==================
-(0) 0xd9870D9E8A19Aa6f4284955BAb1d9C61f2275da3 (100 ETH)
-...
-
-Listening on 127.0.0.1:8545
-```
-
-Then, in the main terminal:
-```console
-#add pwd to bash path
-export PATH=$PATH:.
-
-#see vw help
-vw
-```
-
-You will see something like:
-```text
-Vesting wallet main help
-
-Usage: vw fund|release|..
-
-  vw fund - send funds with vesting wallet
-  vw release - request vesting wallet to release funds
-  ...
-```
-
-**Then, simply follow the usage directions:)**
 
 # License
 

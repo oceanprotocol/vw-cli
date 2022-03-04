@@ -51,7 +51,7 @@ pip install -r requirements.txt
 brownie pm install OpenZeppelin/openzeppelin-contracts@4.0.0
 ```
 
-# Main Usage: CLU
+# Main Usage: CLI
 
 First, compile. From terminal:
 ```console

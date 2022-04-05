@@ -2,8 +2,6 @@
 
 CLI for OpenZeppelin [VestingWallet](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/27f8609ac949fb3a0b24b8194e6ff3eb2dcd0f67/contracts/token/TokenTimelock.sol) contract. 
 
-Todo: final tweaks to properly support non ganache nets.
-
 Functionality is via `vw` tool:
 ```text
 vw fund - send funds with vesting wallet

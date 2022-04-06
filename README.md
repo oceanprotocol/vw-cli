@@ -48,6 +48,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 #install openzeppelin library, to import from .sol (ignore FileExistsErrors)
+brownie pm install OpenZeppelin/openzeppelin-contracts@2.1.1
 brownie pm install OpenZeppelin/openzeppelin-contracts@4.0.0
 ```
 

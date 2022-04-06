@@ -1,7 +1,7 @@
 pragma solidity ^0.5.7;
 // SPDX-License-Identifier: (Apache-2.0 AND CC-BY-4.0)
 
-import "OpenZeppelin/openzeppelin-contracts@2.1.1/contracts/math/SafeMath.sol";
+import "./SafeMath.sol";
 
 contract Simpletoken {
 

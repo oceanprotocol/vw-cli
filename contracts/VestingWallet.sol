@@ -124,12 +124,10 @@ contract VestingWallet is Context {
      * an asset given its total historical allocation.
      */
     function _vestingSchedule(uint256 totalAllocation, uint64 timestamp) internal view virtual returns (uint256) {
-        if (timestamp < start()) {
-            return 0;
-        } else if (timestamp > start() + duration()) {
+        if (timestamp > start() + duration()) {
             return totalAllocation;
         } else {
-            return (totalAllocation * (timestamp - start())) / duration();
+            return 0;
         }
     }
 }

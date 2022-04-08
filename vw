@@ -26,7 +26,7 @@ Usage for beneficiary:
   vw release - request vesting wallet to release funds
 
 Other tools:
-  vw token - create token, for testing
+  vw newtoken - create token, for testing
   vw mine - force chain to pass time (ganache only)
   vw accountinfo - info about an account
   vw walletinfo - info about a vesting wallet
@@ -55,7 +55,6 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
         print(HELP); sys.exit(0)
 
     #extract inputs
-    assert sys.argv[1] == "new_cliff"
     NETWORK = sys.argv[2]
     TO_ADDR = sys.argv[3]
     LOCK_TIME = int(sys.argv[4])
@@ -84,7 +83,6 @@ Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
         print(HELP); sys.exit(0)
 
     #extract inputs
-    assert sys.argv[1] == "new_lin"
     NETWORK = sys.argv[2]
     TO_ADDR = sys.argv[3]
     VEST_BLOCKS = int(sys.argv[4])
@@ -132,7 +130,6 @@ Note: alternative to this, any crypto wallet could be used to transfer funds
         print(HELP); sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "fill"
     NETWORK = sys.argv[2]
     VW_ADDR = sys.argv[3]
     TOKEN_ADDR = sys.argv[4]
@@ -164,7 +161,6 @@ Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "release"
     NETWORK = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
     WALLET_ADDR = sys.argv[4]
@@ -182,10 +178,10 @@ Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
 
 # ========================================================================
 @enforce_types
-def do_token():
+def do_newtoken():
     HELP = f"""Create token, for testing
 
-Usage: vw token NETWORK
+Usage: vw newtoken NETWORK
   NETWORK -- one of {NETWORKS}
 """
     if len(sys.argv) not in [3]:
@@ -193,7 +189,6 @@ Usage: vw token NETWORK
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "token"
     NETWORK = sys.argv[2]
 
     print(f"Arguments:\nNETWORK = {NETWORK}")
@@ -220,7 +215,6 @@ Usage: vw mine BLOCKS TIMEDELTA
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "mine"
     BLOCKS = int(sys.argv[2])
     TIMEDELTA = int(sys.argv[3])
     print(f"Arguments:\nBLOCKS = {BLOCKS}\nTIMEDELTA = {TIMEDELTA}")
@@ -249,7 +243,6 @@ Usage: vw accountinfo NETWORK TOKEN_ADDR ACCOUNT_ADDR
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "accountinfo"
     NETWORK = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
     ACCOUNT_ADDR = sys.argv[4]
@@ -280,7 +273,6 @@ Usage: vw walletinfo NETWORK TOKEN_ADDR WALLET_ADDR
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "walletinfo"
     NETWORK = sys.argv[2]
     TOKEN_ADDR = sys.argv[3]
     WALLET_ADDR = sys.argv[4]
@@ -315,7 +307,6 @@ Usage: vw chaininfo NETWORK
         sys.exit(0)
 
     # extract inputs
-    assert sys.argv[1] == "chaininfo"
     NETWORK = sys.argv[2]
 
     #do work
@@ -354,8 +345,8 @@ def do_main():
         do_release()
 
     #other tools
-    elif sys.argv[1] == "token":
-        do_token()
+    elif sys.argv[1] == "newtoken":
+        do_newtoken()
     elif sys.argv[1] == "mine":
         do_mine()
     elif sys.argv[1] == "accountinfo":

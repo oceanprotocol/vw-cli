@@ -1,6 +1,6 @@
 # VestingWallet CLI
 
-CLI for OpenZeppelin [VestingWallet](https://github.com/oceanprotocol/vw-cli/blob/main/contracts/VestingWallet.sol) contract.
+CLI for wallet contracts with vesting functionality. Based on OpenZeppelin's VestingWallet.sol.
 
 Functionality is via `vw` tool:
 

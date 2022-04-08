@@ -20,7 +20,7 @@ Usage for funder:
   vw new_lin   NETWORK TO_ADDR VEST_BLOCKS - deploy new linear-vesting wallet
   vw new_exp   NETWORK TO_ADDR HALF_LIFE - deploy new exp'l-vesting wallet
 
-  vw transfer NETWORK VW_ADDR TOKEN_ADDR TOKEN_AMT - transfer funds to wallet
+  vw transfer NETWORK TO_ADDR TOKEN_ADDR TOKEN_AMT - transfer funds to wallet
 
 Usage for beneficiary:
   vw release NETWORK TOKEN_ADDR WALLET_ADDR - request wallet to release funds
@@ -69,9 +69,10 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
     from_account = _getPrivateAccount()
     vw = BROWNIE_PROJECT.VestingWalletCliff.deploy(
         TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account})
-    print(f"Generated new wallet:")
+    print(f"Generated new vesting wallet:")
     print(f" address = {vw.address}")
     print(f" created from account = {from_account.address}")
+    print(f" For other vw tools: export VW_ADDR={token.address}")
 
 # ========================================================================
 @enforce_types
@@ -103,6 +104,7 @@ Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
     print(f"Generated new wallet:")
     print(f" address = {vw.address}")
     print(f" created from account = {from_account.address}")
+    print(f" For other vw tools: export VW_ADDR={token.address}")
     
 # ========================================================================
 @enforce_types
@@ -135,6 +137,7 @@ Usage: vw new_exp NETWORK TO_ADDR HALF_LIFE
     print(f"Generated new wallet:")
     print(f" address = {vw.address}")
     print(f" created from account = {from_account.address}")
+    print(f" For other vw tools: export VW_ADDR={token.address}")
 
 # ========================================================================
 @enforce_types
@@ -248,6 +251,7 @@ Usage: vw newtoken NETWORK
     print(f" symbol = {token.symbol()}")
     print(f" address = {token.address}")
     print(f" created from account = {from_account.address}")
+    print(f" For other vw tools: export TOKEN_ADDR={token.address}")
     
 # ========================================================================
 @enforce_types

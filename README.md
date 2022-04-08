@@ -119,14 +119,6 @@ Transaction sent: 0x3f113379b70d00041068b27733c37c2977354d8c70cb0b30b0af3087fca9
 'TEST'
 ```
 
-## Simple Test Script
-
-An example of a script. You can add more. From terminal:
-
-```console
-./scripts/run_vesting_wallet.py
-```
-
 # License
 
     Copyright ((C)) 2022 Ocean Protocol Foundation

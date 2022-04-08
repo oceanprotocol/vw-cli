@@ -17,7 +17,6 @@ HELP_MAIN = """Vesting wallet - main help
 
 Usage: vw fund|release|..
   vw fund - send funds with vesting wallet
-  vw batch - batch send funds via vesting wallets
   vw release - request vesting wallet to release funds
   vw token - create token, for testing
   vw mine - force chain to pass time (ganache only)
@@ -28,12 +27,11 @@ Usage: vw fund|release|..
 
 Transactions are signed with envvar 'VW_KEY`.
 
-Test flow, local net,  1 wallet : token -> fund   -> mine -> release
-                       N wallets: token -> batch  -> mine -> release, rel, ..
-Test flow, remote net, 1 wallet : token -> fund   -> (wait) -> release
-                       N wallets: token -> batch  -> (wait) -> release, rel, ..
-Prod flow, remote net, 1 wallet : fund -> (wait)  -> release
-                       N wallets: batch -> (wait) -> release, rel, .."""
+Test flow, local net  : token -> fund   -> mine -> release
+Test flow, remote net : token -> fund   -> (wait) -> release
+Prod flow, remote net : fund -> (wait)  -> release
+"""
+
 def show_help():
     print(HELP_MAIN)
     sys.exit(0)
@@ -69,53 +67,7 @@ Usage: vw fund NETWORK TOKEN_ADDR LOCK_TIME AMT TO_ADDR
     brownie.network.connect(NETWORK) 
     _create_and_fund_vesting_wallet(NETWORK, TOKEN_ADDR, LOCK_TIME, AMT, TO_ADDR)
     
-# ========================================================================
-def do_batch():
-    HELP_FUND = f"""Vesting wallet - batch send funds via vesting wallets
-
-Usage: vw batch NETWORK TOKEN_ADDR LOCK_TIME CSV
-
-  NETWORK -- one of {NETWORKS}
-  TOKEN_ADDR -- address of token being sent. Eg 0x967da4048cd07ab37855c090aaf366e4ce1b9f48 for OCEAN on eth mainnet
-  LOCK_TIME -- Eg '10' (10 seconds) or '63113852' (2 years)
-  CSV -- csv file, where each row has: amt, address of beneficiary"""
-
-    if len(sys.argv) not in [6]:
-        print(HELP_FUND)
-        sys.exit(0)
-
-    # extract inputs
-    assert sys.argv[1] == "batch"
-    NETWORK = sys.argv[2]
-    TOKEN_ADDR = sys.argv[3]
-    LOCK_TIME = int(sys.argv[4])
-    CSV = sys.argv[5]
-    
-    print(
-        f"Arguments: NETWORK={NETWORK}, TOKEN_ADDR={TOKEN_ADDR}"
-        f", LOCK_TIME={LOCK_TIME}, CSV={CSV}"
-    )
-
-    brownie.network.connect(NETWORK)
-    TO_ADDRs, VWs = [], []
-    with open(CSV, 'r') as csv_file:
-        reader = csv.reader(csv_file)
-        for row in reader:
-            (AMT, TO_ADDR) = row
-            print(f"call vw fund for TO_ADDR: {TO_ADDR[:5]}..")
-            
-            VW = _create_and_fund_vesting_wallet(
-                NETWORK, TOKEN_ADDR, LOCK_TIME, float(AMT), TO_ADDR.strip())
-            TO_ADDRs.append(TO_ADDR)
-            VWs.append(VW)
-            
-    print(f"Done batch. TO_ADDR --> WALLET_ADDR:")
-    for (TO_ADDR, VW) in zip(TO_ADDRs, VWs):
-        print(f"{TO_ADDR} --> {VW.address}")
-
-def _create_and_fund_vesting_wallet(NETWORK, TOKEN_ADDR, LOCK_TIME, AMT, TO_ADDR):
-    """helper to do_fund() and do_batch()"""
-    
+def _create_and_fund_vesting_wallet(NETWORK, TOKEN_ADDR, LOCK_TIME, AMT, TO_ADDR):    
     #brownie setup
     accounts = brownie.network.accounts
     chain = brownie.network.chain
@@ -130,7 +82,7 @@ def _create_and_fund_vesting_wallet(NETWORK, TOKEN_ADDR, LOCK_TIME, AMT, TO_ADDR
     #deploy vesting wallet
     print("Deploy vesting wallet...")
     start_timestamp = chain[-1].timestamp + 5  # magic number
-    vesting_wallet = BROWNIE_PROJECT.VestingWallet.deploy(
+    vesting_wallet = BROWNIE_PROJECT.VestingWalletCliff.deploy(
         TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account}
     )
 
@@ -172,7 +124,7 @@ Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
     from_account = _getPrivateAccount()
 
     #release the token
-    vesting_wallet = BROWNIE_PROJECT.VestingWallet.at(WALLET_ADDR)
+    vesting_wallet = BROWNIE_PROJECT.VestingWalletCliff.at(WALLET_ADDR)
     vesting_wallet.release(TOKEN_ADDR, {"from": from_account})
     
     print("Funds have been released.")
@@ -301,7 +253,7 @@ Usage: vw walletinfo NETWORK TOKEN_ADDR WALLET_ADDR
 
     #release the token
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
-    wallet = BROWNIE_PROJECT.VestingWallet.at(WALLET_ADDR)
+    wallet = BROWNIE_PROJECT.VestingWalletCliff.at(WALLET_ADDR)
     amt_vested = wallet.vestedAmount(token.address, chain[-1].timestamp)
     amt_released = wallet.released(token.address)
     print(f"For vesting wallet {WALLET_ADDR[:5]}.., token '{token.symbol()}':")
@@ -329,8 +281,6 @@ def do_main():
         do_token()
     elif sys.argv[1] == "fund":
         do_fund()
-    elif sys.argv[1] == "batch":
-        do_batch()
     elif sys.argv[1] == "mine":
         do_mine()
     elif sys.argv[1] == "release":

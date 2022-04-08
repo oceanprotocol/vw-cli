@@ -8,7 +8,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/Context.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/math/Math.sol";
 
 /**
- * @title VestingWallet
+ * @title VestingWalletLinear
  * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
  * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
@@ -17,7 +17,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/math/Math.sol"
  * Consequently, if the vesting has already started, any amount of tokens sent to this contract will (at least partly)
  * be immediately releasable.
  */
-contract VestingWallet is Context {
+contract VestingWalletLinear is Context {
     event EtherReleased(uint256 amount);
     event ERC20Released(address token, uint256 amount);
 
@@ -35,7 +35,7 @@ contract VestingWallet is Context {
         uint64 startTimestamp,
         uint64 durationSeconds
     ) {
-        require(beneficiaryAddress != address(0), "VestingWallet: beneficiary is zero address");
+        require(beneficiaryAddress != address(0), "VestingWalletLinear: beneficiary is zero address");
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;
         _duration = durationSeconds;

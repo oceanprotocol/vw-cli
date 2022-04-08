@@ -22,26 +22,26 @@ def test_basic():
     num_blocks_duration = 4
 
     # constructor
-    vesting_wallet = BROWNIE_PROJECT.VestingWalletLinear.deploy(
+    vw = BROWNIE_PROJECT.VestingWalletLinear.deploy(
         beneficiary,
         toBase18(start_block),
         toBase18(num_blocks_duration),
         {"from": account0},
     )
 
-    assert vesting_wallet.beneficiary() == beneficiary
-    start_block_measured = int(vesting_wallet.startBlock() / 1e18)
+    assert vw.beneficiary() == beneficiary
+    start_block_measured = int(vw.startBlock() / 1e18)
     assert start_block_measured in [start_block - 1, start_block, start_block + 1]
-    assert int(vesting_wallet.numBlocksDuration() / 1e18) == 4
-    assert vesting_wallet.released() == 0
+    assert int(vw.numBlocksDuration() / 1e18) == 4
+    assert vw.released() == 0
 
     # time passes
     chain.mine(blocks=15, timedelta=1)
-    assert vesting_wallet.released() == 0  # haven't released anything
+    assert vw.released() == 0  # haven't released anything
 
     # call release
-    vesting_wallet.release()
-    assert vesting_wallet.released() == 0  # wallet never got funds to release!
+    vw.release()
+    assert vw.released() == 0  # wallet never got funds to release!
 
 
 def test_ethFunding():

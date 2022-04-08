@@ -20,20 +20,22 @@ Usage for funder:
   vw new_lin   NETWORK TO_ADDR VEST_BLOCKS - deploy new linear-vesting wallet
   vw new_exp   NETWORK TO_ADDR HALF_LIFE - deploy new exp'l-vesting wallet
 
-  vw fill NETWORK VW_ADDR TOKEN_ADDR TOKEN_AMT - transfer funds to vesting wallet
+  vw transfer NETWORK VW_ADDR TOKEN_ADDR TOKEN_AMT - transfer funds to wallet
 
 Usage for beneficiary:
-  vw release - request vesting wallet to release funds
+  vw release NETWORK TOKEN_ADDR WALLET_ADDR - request wallet to release funds
 
 Other tools:
-  vw newtoken - create token, for testing
-  vw mine - force chain to pass time (ganache only)
-  vw accountinfo - info about an account
-  vw walletinfo - info about a vesting wallet
+  vw newacct - generate new account
+  vw newtoken NETWORK - create token, for testing
+  vw mine BLOCKS [TIMEDELTA] - force chain to pass time (ganache only)
+
+  vw acctinfo NETWORK ACCOUNT_ADDR TOKEN_ADDR - info about an account
+  vw walletinfo NETWORK WALLET_ADDR [TOKEN_ADDR] - info about a vesting wallet
   vw chaininfo NETWORK - info about a network
   vw help - this message
 
-Transactions are signed with envvar 'VW_KEY`.
+Transactions are signed with envvar 'VW_PRIVATE_KEY`.
 """
 
 @enforce_types
@@ -51,7 +53,7 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
   TO_ADDR -- address of beneficiary
   LOCK_TIME -- Eg '10' (10 seconds) or '63113852' (2 years)
 """
-    if len(sys.argv) not in [6]:
+    if len(sys.argv) not in [5]:
         print(HELP); sys.exit(0)
 
     #extract inputs
@@ -67,7 +69,9 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
     from_account = _getPrivateAccount()
     vw = BROWNIE_PROJECT.VestingWalletCliff.deploy(
         TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account})
-    print(f"Deployed wallet deployed at address: {vw.address}")
+    print(f"Generated new wallet:")
+    print(f" address = {vw.address}")
+    print(f" created from account = {from_account.address}")
 
 # ========================================================================
 @enforce_types
@@ -96,8 +100,9 @@ Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
     vw = BROWNIE_PROJECT.VestingWalletLinear.deploy(
         TO_ADDR, toBase18(start_block), toBase18(VEST_BLOCKS),
         {"from": from_account})
-    print(f"Deployed wallet deployed at address: {vw.address}")
-
+    print(f"Generated new wallet:")
+    print(f" address = {vw.address}")
+    print(f" created from account = {from_account.address}")
     
 # ========================================================================
 @enforce_types
@@ -111,30 +116,48 @@ Usage: vw new_exp NETWORK TO_ADDR HALF_LIFE
 """
     if len(sys.argv) not in [6]:
         print(HELP); sys.exit(0)
-    raise NotImplementedError()
+
+    #extract inputs
+    NETWORK = sys.argv[2]
+    TO_ADDR = sys.argv[3]
+    HALF_LIFE = int(sys.argv[4])
+    print(f"Arguments: \nNETWORK = {NETWORK}\n TO_ADDR = {TO_ADDR}" \
+          f"\nHALF_LIFE = {HALF_LIFE}")
+    
+    #main work
+    brownie.network.connect(NETWORK)
+    start_block = len(brownie.network.chain) + 1
+    from_account = _getPrivateAccount()
+    print("Need to implement VestingWalletExp.sol. Exiting."); sys.exit(0)
+    vw = BROWNIE_PROJECT.VestingWalletExp.deploy(
+        TO_ADDR, toBase18(start_block), toBase18(HALF_LIFE),
+        {"from": from_account})
+    print(f"Generated new wallet:")
+    print(f" address = {vw.address}")
+    print(f" created from account = {from_account.address}")
 
 # ========================================================================
 @enforce_types
-def do_fill():
-    HELP = f"""Transfer funds to vesting wallet
+def do_transfer():
+    HELP = f"""Transfer funds to wallet
 
-Usage: vw fill NETWORK VW_ADDR TOKEN_ADDR TOKEN_AMT 
+Usage: vw transfer NETWORK TO_ADDR TOKEN_ADDR TOKEN_AMT 
   NETWORK -- one of {NETWORKS}
-  VW_ADDR -- address of vesting wallet
+  TO_ADDR -- recipient address, e.g. vesting wallet
   TOKEN_ADDR -- address of token being sent
   TOKEN_AMT -- e.g. '1000' (base-18, not wei)
 
 Note: alternative to this, any crypto wallet could be used to transfer funds
 """
-    if len(sys.argv) not in [7]:
+    if len(sys.argv) not in [6]:
         print(HELP); sys.exit(0)
 
     # extract inputs
     NETWORK = sys.argv[2]
-    VW_ADDR = sys.argv[3]
+    TO_ADDR = sys.argv[3]
     TOKEN_ADDR = sys.argv[4]
-    TOKEN_AMT = float(sys.argv[6])
-    print(f"Arguments:\nNETWORK = {NETWORK}\nVW_ADDR = {VW_ADDR}"
+    TOKEN_AMT = float(sys.argv[5])
+    print(f"Arguments:\nNETWORK = {NETWORK}\nTO_ADDR = {TO_ADDR}"
           f"\nTOKEN_ADDR = {TOKEN_ADDR}\nTOKEN_AMT = {TOKEN_AMT}")
         
     #main work
@@ -142,14 +165,13 @@ Note: alternative to this, any crypto wallet could be used to transfer funds
     chain = brownie.network.chain
     from_account = _getPrivateAccount()
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
-    vw = BROWNIE_PROJECT.VestingWalletCliff.at(VW_ADDR)
-    token.transfer(vw, toBase18(TOKEN_AMT), {"from": from_account})
-    print(f"Sent {TOKEN_AMT} {token.symbol} to wallet {VW_ADDR}")
+    token.transfer(TO_ADDR, toBase18(TOKEN_AMT), {"from": from_account})   
+    print(f"Sent {TOKEN_AMT} {token.symbol()} to wallet {TO_ADDR}")
 
 # ========================================================================
 @enforce_types
 def do_release():
-    HELP = f"""Request vesting wallet to release funds
+    HELP = f"""Request wallet to release funds
 
 Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
   NETWORK -- one of {NETWORKS}
@@ -178,6 +200,29 @@ Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
 
 # ========================================================================
 @enforce_types
+def do_newacct():
+    HELP = f"""Generate new account.
+
+Usage: vw newacct
+"""
+    if len(sys.argv) not in [2]:
+        print(HELP)
+        sys.exit(0)
+
+    # extract inputs
+    assert sys.argv[1] == "newacct"
+
+    #main work
+    NETWORK = 'development' #hardcoded bc it's the only one we can force
+    brownie.network.connect(NETWORK) 
+    account = brownie.network.accounts.add()
+    print("Generated new account:")
+    print(f" address = {account.address}")
+    print(f" private_key = {account.private_key}")
+    print(f" For other vw tools: export VW_PRIVATE_KEY={account.private_key}")
+    
+# ========================================================================
+@enforce_types
 def do_newtoken():
     HELP = f"""Create token, for testing
 
@@ -199,7 +244,10 @@ Usage: vw newtoken NETWORK
     from_account = _getPrivateAccount()
     token = BROWNIE_PROJECT.Simpletoken.deploy(
         "TST", "Test Token", 18, 1e21, {"from": from_account})
-    print(f"Token '{token.symbol()}' deployed at address: {token.address}")
+    print("Generated new token:")
+    print(f" symbol = {token.symbol()}")
+    print(f" address = {token.address}")
+    print(f" created from account = {from_account.address}")
     
 # ========================================================================
 @enforce_types
@@ -230,69 +278,76 @@ Usage: vw mine BLOCKS TIMEDELTA
 
 # ========================================================================
 @enforce_types
-def do_accountinfo():
-    HELP = f"""Info about an account
+def do_acctinfo():
+    HELP = f"""Info about an account.
 
-Usage: vw accountinfo NETWORK TOKEN_ADDR ACCOUNT_ADDR
+Usage: vw acctinfo NETWORK ACCOUNT_ADDR TOKEN_ADDR
   NETWORK -- one of {NETWORKS}
+  ACCOUNT_ADDR -- e.g. '0x987...' or '4'. If the latter, uses accounts[i]
   TOKEN_ADDR -- e.g. '0x123..'
-  ACCOUNT_ADDR -- account address, e.g. '0x987...'
 """
     if len(sys.argv) not in [5]:
         print(HELP)
         sys.exit(0)
 
     # extract inputs
+    assert sys.argv[1] == "acctinfo"
     NETWORK = sys.argv[2]
-    TOKEN_ADDR = sys.argv[3]
-    ACCOUNT_ADDR = sys.argv[4]
+    ACCOUNT_ADDR = sys.argv[3]
+    TOKEN_ADDR = sys.argv[4] 
 
-    print(f"Arguments:\nNETWORK = {NETWORK}\nTOKEN_ADDR = {TOKEN_ADDR}"
-          f"\nACCOUNT_ADDR = {ACCOUNT_ADDR}"
-    )
-
-    #main work
+    # do work
+    print("Account info:")
     brownie.network.connect(NETWORK)
-    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+    if len(str(ACCOUNT_ADDR)) == 1:
+        addr_i = int(ACCOUNT_ADDR)
+        ACCOUNT_ADDR = brownie.accounts[addr_i]
+    print(f"  Address = {ACCOUNT_ADDR}")
+
+    token = B.Simpletoken.at(TOKEN_ADDR)
     balance = token.balanceOf(ACCOUNT_ADDR)
-    print(f"For account {ACCOUNT_ADDR[:5]}.., token '{token.symbol()}':")
-    print(f"  balance of token : {fromBase18(balance)} {token.symbol()}")
+    print(f"  {fromBase18(balance)} {token.symbol()}")
 
 # ========================================================================
 @enforce_types
 def do_walletinfo():
     HELP = f"""Info about a vesting wallet
 
-Usage: vw walletinfo NETWORK TOKEN_ADDR WALLET_ADDR
+Usage:   vw walletinfo NETWORK WALLET_ADDR [TOKEN_ADDR]
   NETWORK -- one of {NETWORKS}
-  TOKEN_ADDR -- e.g. '0x123..'
   WALLET_ADDR -- vesting wallet address
+  TOKEN_ADDR -- e.g. '0x123..'
 """
-    if len(sys.argv) not in [5]:
+    if len(sys.argv) not in [4,5]:
         print(HELP)
         sys.exit(0)
 
     # extract inputs
     NETWORK = sys.argv[2]
-    TOKEN_ADDR = sys.argv[3]
-    WALLET_ADDR = sys.argv[4]
+    WALLET_ADDR = sys.argv[3]
+    TOKEN_ADDR = sys.argv[4] if len(sys.argv)==5 else None
 
-    print(f"Arguments:\nNETWORK={NETWORK}\nTOKEN_ADDR = {TOKEN_ADDR}"
-          f"\nWALLET_ADDR = {WALLET_ADDR}")
+    print(f"Arguments:\nNETWORK={NETWORK}" \
+          f"\nWALLET_ADDR = {WALLET_ADDR}" \
+          f"\nTOKEN_ADDR = {TOKEN_ADDR}")
 
     #main work
     brownie.network.connect(NETWORK)
     chain = brownie.network.chain
-    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
     wallet = BROWNIE_PROJECT.VestingWalletCliff.at(WALLET_ADDR)
-    amt_vested = wallet.vestedAmount(token.address, chain[-1].timestamp)
-    amt_released = wallet.released(token.address)
-    print(f"For vesting wallet {WALLET_ADDR[:5]}.., token '{token.symbol()}':")
-    print(f"  beneficiary: {wallet.beneficiary()[:5]}..")
-    print(f"  start: {wallet.start()} (compare to current chain time of {chain[-1].timestamp})")
-    print(f"  duration: {wallet.duration()} s")
-    print(f"  amt vested: {fromBase18(amt_vested)} {token.symbol()}")
-    print(f"  amt released: {fromBase18(amt_released)} {token.symbol()}")
+    print(f"Vesting wallet info:")
+    print(f"  address = {WALLET_ADDR}")
+    print(f"  beneficiary = {wallet.beneficiary()}..")
+    print(f"  duration = {wallet.duration()} s")
+    print(f"  start timestamp = {wallet.start()}")
+    print(f"  (compare to current chain timestamp = {chain[-1].timestamp})")
+    if TOKEN_ADDR is not None:
+        print(f"  For token '{token.symbol()}':")
+        token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+        amt_vested = wallet.vestedAmount(token.address, chain[-1].timestamp)
+        amt_released = wallet.released(token.address)
+        print(f"    amt vested: {fromBase18(amt_vested)} {token.symbol()}")
+        print(f"    amt released: {fromBase18(amt_released)} {token.symbol()}")
 
 # ========================================================================
 @enforce_types
@@ -318,9 +373,9 @@ Usage: vw chaininfo NETWORK
 # ========================================================================
 @enforce_types
 def _getPrivateAccount():
-    private_key = os.getenv('VW_KEY')
+    private_key = os.getenv('VW_PRIVATE_KEY')
     account = brownie.network.accounts.add(private_key=private_key)
-    print(f"For private key VW_KEY, address is: {account.address}")
+    print(f"For VW_PRIVATE_KEY, address is: {account.address}")
     return account
 
 # ========================================================================
@@ -337,20 +392,22 @@ def do_main():
         do_new_lin()
     elif sys.argv[1] == "new_exp":
         do_new_exp()
-    elif sys.argv[1] == "fill":
-        do_fill()
+    elif sys.argv[1] == "transfer":
+        do_transfer()
 
     #usage for beneficiary
     elif sys.argv[1] == "release":
         do_release()
 
     #other tools
+    elif sys.argv[1] == "newacct":
+        do_newacct()
     elif sys.argv[1] == "newtoken":
         do_newtoken()
     elif sys.argv[1] == "mine":
         do_mine()
-    elif sys.argv[1] == "accountinfo":
-        do_accountinfo()
+    elif sys.argv[1] == "acctinfo":
+        do_acctinfo()
     elif sys.argv[1] == "walletinfo":
         do_walletinfo()
     elif sys.argv[1] == "chaininfo":

@@ -6,7 +6,7 @@ Functionality is via `vw` tool:
 
 ```text
 vw new_TYPE - deploy new wallet with TYPE = cliff, linear, or exponential vesting
-vw fill - transfer funds to vesting wallet
+vw transfer - transfer funds to wallet
 vw release - request vesting wallet to release funds
 ..
 ```

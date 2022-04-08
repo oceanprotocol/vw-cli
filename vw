@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
+import brownie
+from enforce_typing import enforce_types
 import csv
 import os
 import sys
-
-import brownie
 
 from util.base18 import toBase18, fromBase18
 
@@ -30,16 +30,19 @@ Other tools:
   vw mine - force chain to pass time (ganache only)
   vw accountinfo - info about an account
   vw walletinfo - info about a vesting wallet
+  vw chaininfo NETWORK - info about a network
   vw help - this message
 
 Transactions are signed with envvar 'VW_KEY`.
 """
 
-def show_help():
+@enforce_types
+def do_help():
     print(HELP_MAIN)
     sys.exit(0)
 
 # ========================================================================
+@enforce_types
 def do_new_cliff():
     HELP = f"""Deploy new cliff wallet (timelock)
 
@@ -68,6 +71,7 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
     print(f"Deployed wallet deployed at address: {vw.address}")
 
 # ========================================================================
+@enforce_types
 def do_new_lin():
     HELP = f"""Deploy new linear-vesting wallet
 
@@ -98,6 +102,7 @@ Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
 
     
 # ========================================================================
+@enforce_types
 def do_new_exp():
     HELP=f"""Deploy new exponential-vesting wallet
 
@@ -111,6 +116,7 @@ Usage: vw new_exp NETWORK TO_ADDR HALF_LIFE
     raise NotImplementedError()
 
 # ========================================================================
+@enforce_types
 def do_fill():
     HELP = f"""Transfer funds to vesting wallet
 
@@ -144,6 +150,7 @@ Note: alternative to this, any crypto wallet could be used to transfer funds
     print(f"Sent {TOKEN_AMT} {token.symbol} to wallet {VW_ADDR}")
 
 # ========================================================================
+@enforce_types
 def do_release():
     HELP = f"""Request vesting wallet to release funds
 
@@ -174,6 +181,7 @@ Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
     print("Funds have been released.")
 
 # ========================================================================
+@enforce_types
 def do_token():
     HELP = f"""Create token, for testing
 
@@ -199,6 +207,7 @@ Usage: vw token NETWORK
     print(f"Token '{token.symbol()}' deployed at address: {token.address}")
     
 # ========================================================================
+@enforce_types
 def do_mine():
     HELP = f"""Force chain to pass time (ganache only)
 
@@ -226,7 +235,8 @@ Usage: vw mine BLOCKS TIMEDELTA
     print("Done.")
 
 # ========================================================================
-def show_accountinfo():
+@enforce_types
+def do_accountinfo():
     HELP = f"""Info about an account
 
 Usage: vw accountinfo NETWORK TOKEN_ADDR ACCOUNT_ADDR
@@ -256,7 +266,8 @@ Usage: vw accountinfo NETWORK TOKEN_ADDR ACCOUNT_ADDR
     print(f"  balance of token : {fromBase18(balance)} {token.symbol()}")
 
 # ========================================================================
-def show_walletinfo():
+@enforce_types
+def do_walletinfo():
     HELP = f"""Info about a vesting wallet
 
 Usage: vw walletinfo NETWORK TOKEN_ADDR WALLET_ADDR
@@ -292,6 +303,29 @@ Usage: vw walletinfo NETWORK TOKEN_ADDR WALLET_ADDR
     print(f"  amt released: {fromBase18(amt_released)} {token.symbol()}")
 
 # ========================================================================
+@enforce_types
+def do_chaininfo():
+    HELP = f"""Info about a network
+
+Usage: vw chaininfo NETWORK
+  NETWORK -- one of {NETWORKS}
+"""
+    if len(sys.argv) not in [3]:
+        print(HELP)
+        sys.exit(0)
+
+    # extract inputs
+    assert sys.argv[1] == "chaininfo"
+    NETWORK = sys.argv[2]
+
+    #do work
+    brownie.network.connect(NETWORK)
+    blocks = len(brownie.network.chain)
+    print("\nChain info:")
+    print(f"  # blocks: {len(brownie.network.chain)}")
+    
+# ========================================================================
+@enforce_types
 def _getPrivateAccount():
     private_key = os.getenv('VW_KEY')
     account = brownie.network.accounts.add(private_key=private_key)
@@ -300,9 +334,10 @@ def _getPrivateAccount():
 
 # ========================================================================
 # main
+@enforce_types
 def do_main():
     if len(sys.argv) == 1 or sys.argv[1] == "help":
-        show_help()
+        do_help()
 
     #usage for funder
     elif sys.argv[1] == "new_cliff":
@@ -324,11 +359,13 @@ def do_main():
     elif sys.argv[1] == "mine":
         do_mine()
     elif sys.argv[1] == "accountinfo":
-        show_accountinfo()
+        do_accountinfo()
     elif sys.argv[1] == "walletinfo":
-        show_walletinfo()
+        do_walletinfo()
+    elif sys.argv[1] == "chaininfo":
+        do_chaininfo()
     else:
-        show_help()
+        do_help()
 
 if __name__ == "__main__":
     do_main()

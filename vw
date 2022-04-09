@@ -8,7 +8,7 @@ import sys
 
 from util.base18 import toBase18, fromBase18
 
-BROWNIE_PROJECT = brownie.project.load("./", name="MyProject")
+B = brownie.project.load("./", name="MyProject")
 
 NETWORKS = ['development', 'eth_mainnet'] #development = ganache
 
@@ -67,7 +67,7 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
     brownie.network.connect(NETWORK)
     start_timestamp = brownie.network.chain[-1].timestamp + 1
     from_account = _getPrivateAccount()
-    wallet = BROWNIE_PROJECT.VestingWalletCliff.deploy(
+    wallet = B.VestingWalletCliff.deploy(
         TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account})
     print(f"Created new cliff wallet:")
     print(f" address = {wallet.address}")
@@ -98,7 +98,7 @@ Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
     brownie.network.connect(NETWORK)
     start_block = len(brownie.network.chain) + 1
     from_account = _getPrivateAccount()
-    wallet = BROWNIE_PROJECT.VestingWalletLinear.deploy(
+    wallet = B.VestingWalletLinear.deploy(
         TO_ADDR, toBase18(start_block), toBase18(VEST_BLOCKS),
         {"from": from_account})
     print(f"Created new linear wallet:")
@@ -131,7 +131,7 @@ Usage: vw new_exp NETWORK TO_ADDR HALF_LIFE
     start_block = len(brownie.network.chain) + 1
     from_account = _getPrivateAccount()
     print("Need to implement VestingWalletExp.sol. Exiting."); sys.exit(0)
-    wallet = BROWNIE_PROJECT.VestingWalletExp.deploy(
+    wallet = B.VestingWalletExp.deploy(
         TO_ADDR, toBase18(start_block), toBase18(HALF_LIFE),
         {"from": from_account})
     print(f"Created new exponential wallet:")
@@ -167,7 +167,7 @@ Note: alternative to this, any crypto wallet could be used to transfer funds
     brownie.network.connect(NETWORK) 
     chain = brownie.network.chain
     from_account = _getPrivateAccount()
-    token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+    token = B.Simpletoken.at(TOKEN_ADDR)
     token.transfer(WALLET_ADDR, toBase18(TOKEN_AMT), {"from": from_account})   
     print(f"Sent {TOKEN_AMT} {token.symbol()} to wallet {WALLET_ADDR}")
 
@@ -247,7 +247,7 @@ Usage: vw newtoken NETWORK
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
     from_account = _getPrivateAccount()
-    token = BROWNIE_PROJECT.Simpletoken.deploy(
+    token = B.Simpletoken.deploy(
         "TST", "Test Token", 18, 1e21, {"from": from_account})
     print("Created new token:")
     print(f" symbol = {token.symbol()}")
@@ -307,16 +307,16 @@ Usage: vw acctinfo NETWORK ACCOUNT_ADDR TOKEN_ADDR
     TOKEN_ADDR = sys.argv[4] 
 
     # do work
-    print("Account info:")
     brownie.network.connect(NETWORK)
     if len(str(ACCOUNT_ADDR)) == 1:
         addr_i = int(ACCOUNT_ADDR)
         ACCOUNT_ADDR = brownie.accounts[addr_i]
-    print(f"  Address = {ACCOUNT_ADDR}")
+    print("Account info:")
+    print(f"  address = {ACCOUNT_ADDR}")
 
     token = B.Simpletoken.at(TOKEN_ADDR)
     balance = token.balanceOf(ACCOUNT_ADDR)
-    print(f"  {fromBase18(balance)} {token.symbol()}")
+    print(f"  balance = {fromBase18(balance)} {token.symbol()}")
 
 # ========================================================================
 @enforce_types
@@ -366,7 +366,7 @@ Usage: vw walletinfo TYPE NETWORK WALLET_ADDR [TOKEN_ADDR]
         print(f"  start block = block {int(fromBase18(wallet.start()))}")
         
     if TOKEN_ADDR is not None:
-        token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+        token = B.Simpletoken.at(TOKEN_ADDR)
         print(f"  for token '{token.symbol()}':")
         amt_vested = wallet.vestedAmount(token.address, chain[-1].timestamp)
         amt_released = wallet.released(token.address)
@@ -408,11 +408,11 @@ def _getPrivateAccount():
 
 def _getWallet(_type, wallet_addr):
     if _type == "cliff":
-        return BROWNIE_PROJECT.VestingWalletCliff.at(wallet_addr)
+        return B.VestingWalletCliff.at(wallet_addr)
     elif _type == "lin":
-        return BROWNIE_PROJECT.VestingWalletLinear.at(wallet_addr)
+        return B.VestingWalletLinear.at(wallet_addr)
     elif _type == "exp":
-        return BROWNIE_PROJECT.VestingWalletExp.at(wallet_addr)
+        return B.VestingWalletExp.at(wallet_addr)
     else:
         raise ValueError(_type)
 

@@ -5,24 +5,19 @@ CLI for wallet contracts with vesting functionality. Based on OpenZeppelin's Ves
 Functionality is via `vw` tool:
 
 ```text
-vw fund - send funds with vesting wallet
-vw batch - batch send funds via vesting wallets
+vw new_TYPE - deploy new wallet with TYPE = cliff, linear, or exponential vesting
+vw transfer - transfer funds to wallet
 vw release - request vesting wallet to release funds
-vw token - create token, for testing
-vw mine - force chain to pass time (ganache only)
-vw accountinfo - info about an account
-vw walletinfo - info about a vesting wallet
+..
 ```
 
 Other features:
 
-- Via brownie, easy to interact with contract in console
+- Via [brownie](https://eth-brownie.readthedocs.io/en/latest/), easy to interact with contract in console
 - Thorough unit tests
 
 Potential future features:
 
-- CLI currently supports fixed lock time ("cliff of x"); could pull up contract functionality for linear vesting
-- CLI currently supports ERC20; could pull up contract functionality for ETH
 - Usage requires `git clone` etc. Could add to pip, or make it a fully independent tool
 
 # Installation
@@ -117,14 +112,6 @@ Transaction sent: 0x3f113379b70d00041068b27733c37c2977354d8c70cb0b30b0af3087fca9
 
 >>> t.symbol()
 'TEST'
-```
-
-## Simple Test Script
-
-An example of a script. You can add more. From terminal:
-
-```console
-./scripts/run_vesting_wallet.py
 ```
 
 # License

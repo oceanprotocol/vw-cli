@@ -40,7 +40,7 @@ def test_ethFunding():
     # where beneficiary is accounts[1]
     start_timestamp = chain[-1].timestamp + 5  # magic number
     duration_seconds = 30  # magic number
-    wallet = BROWNIE_PROJECT.VestingWallet.deploy(
+    wallet = BROWNIE_PROJECT.VestingWalletCliff.deploy(
         accounts[1].address, start_timestamp, duration_seconds, {"from": accounts[0]}
     )
 
@@ -100,7 +100,7 @@ def test_tokenFunding():
     beneficiary_address = accounts[1].address
     start_timestamp = chain[-1].timestamp + 5  # magic number
     duration_seconds = 30  # magic number
-    wallet = BROWNIE_PROJECT.VestingWallet.deploy(
+    wallet = BROWNIE_PROJECT.VestingWalletCliff.deploy(
         beneficiary_address, start_timestamp, duration_seconds, {"from": accounts[0]}
     )
 
@@ -149,7 +149,7 @@ def _vesting_wallet():
 
     duration_seconds = 30  # magic number
 
-    w = BROWNIE_PROJECT.VestingWallet.deploy(
+    w = BROWNIE_PROJECT.VestingWalletCliff.deploy(
         beneficiary_address,
         start_timestamp,
         duration_seconds,

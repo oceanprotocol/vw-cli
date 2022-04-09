@@ -30,9 +30,9 @@ Other tools:
   vw newtoken NETWORK - create token, for testing
   vw mine BLOCKS [TIMEDELTA] - force chain to pass time (ganache only)
 
-  vw acctinfo NETWORK ACCOUNT_ADDR TOKEN_ADDR - info about an account
-  vw walletinfo NETWORK WALLET_ADDR [TOKEN_ADDR] - info about a vesting wallet
-  vw chaininfo NETWORK - info about a network
+  vw acctinfo NETWORK ACCOUNT_ADDR TOKEN_ADDR - info about account
+  vw walletinfo TYPE NETWORK WALLET_ADDR [TOKEN_ADDR] - info about wallet
+  vw chaininfo NETWORK - info about network
   vw help - this message
 
 Transactions are signed with envvar 'VW_PRIVATE_KEY`.
@@ -315,7 +315,7 @@ Usage: vw acctinfo NETWORK ACCOUNT_ADDR TOKEN_ADDR
 # ========================================================================
 @enforce_types
 def do_walletinfo():
-    HELP = f"""Info about a vesting wallet
+    HELP = f"""Info about wallet
 
 Usage: vw walletinfo TYPE NETWORK WALLET_ADDR [TOKEN_ADDR]
   TYPE -- one of cliff|lin|exp

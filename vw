@@ -20,7 +20,7 @@ Usage for funder:
   vw new_lin   NETWORK TO_ADDR VEST_BLOCKS - create new linear-vesting wallet
   vw new_exp   NETWORK TO_ADDR HALF_LIFE - create new exp'l-vesting wallet
 
-  vw transfer NETWORK TO_ADDR TOKEN_ADDR TOKEN_AMT - transfer funds to wallet
+  vw transfer NETWORK WALLET_ADDR TOKEN_ADDR TOKEN_AMT - transfer funds to wallet
 
 Usage for beneficiary:
   vw release NETWORK TOKEN_ADDR WALLET_ADDR - request wallet to release funds
@@ -77,7 +77,7 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
 # ========================================================================
 @enforce_types
 def do_new_lin():
-    HELP = f"""Create new linear-vesting wallet
+    HELP = f"""Create new linear-vesting wallet. **EXPERIMENTAL!**
 
 Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
   NETWORK -- one of {NETWORKS}
@@ -109,7 +109,7 @@ Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
 # ========================================================================
 @enforce_types
 def do_new_exp():
-    HELP=f"""Create new exponential-vesting wallet
+    HELP=f"""Create new exponential-vesting wallet. **EXPERIMENTAL!**
 
 Usage: vw new_exp NETWORK TO_ADDR HALF_LIFE
   NETWORK -- one of {NETWORKS}
@@ -144,9 +144,9 @@ Usage: vw new_exp NETWORK TO_ADDR HALF_LIFE
 def do_transfer():
     HELP = f"""Transfer funds to wallet
 
-Usage: vw transfer NETWORK TO_ADDR TOKEN_ADDR TOKEN_AMT 
+Usage: vw transfer NETWORK WALLET_ADDR TOKEN_ADDR TOKEN_AMT 
   NETWORK -- one of {NETWORKS}
-  TO_ADDR -- recipient address, e.g. vesting wallet
+  WALLET_ADDR -- wallet address
   TOKEN_ADDR -- address of token being sent
   TOKEN_AMT -- e.g. '1000' (base-18, not wei)
 
@@ -157,10 +157,10 @@ Note: alternative to this, any crypto wallet could be used to transfer funds
 
     # extract inputs
     NETWORK = sys.argv[2]
-    TO_ADDR = sys.argv[3]
+    WALLET_ADDR = sys.argv[3]
     TOKEN_ADDR = sys.argv[4]
     TOKEN_AMT = float(sys.argv[5])
-    print(f"Arguments:\nNETWORK = {NETWORK}\nTO_ADDR = {TO_ADDR}"
+    print(f"Arguments:\nNETWORK = {NETWORK}\nWALLET_ADDR = {WALLET_ADDR}"
           f"\nTOKEN_ADDR = {TOKEN_ADDR}\nTOKEN_AMT = {TOKEN_AMT}")
         
     #main work
@@ -168,8 +168,8 @@ Note: alternative to this, any crypto wallet could be used to transfer funds
     chain = brownie.network.chain
     from_account = _getPrivateAccount()
     token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
-    token.transfer(TO_ADDR, toBase18(TOKEN_AMT), {"from": from_account})   
-    print(f"Sent {TOKEN_AMT} {token.symbol()} to wallet {TO_ADDR}")
+    token.transfer(WALLET_ADDR, toBase18(TOKEN_AMT), {"from": from_account})   
+    print(f"Sent {TOKEN_AMT} {token.symbol()} to wallet {WALLET_ADDR}")
 
 # ========================================================================
 @enforce_types
@@ -258,17 +258,17 @@ Usage: vw newtoken NETWORK
 def do_mine():
     HELP = f"""Force chain to pass time (ganache only)
 
-Usage: vw mine BLOCKS TIMEDELTA
+Usage: vw mine BLOCKS [TIMEDELTA]
   BLOCKS -- e.g. 3
   TIMEDELTA -- e.g. 100
 """
-    if len(sys.argv) not in [4]:
+    if len(sys.argv) not in [3,4]:
         print(HELP)
         sys.exit(0)
 
     # extract inputs
     BLOCKS = int(sys.argv[2])
-    TIMEDELTA = int(sys.argv[3])
+    TIMEDELTA = int(sys.argv[3]) if len(sys.argv) == 4 else None
     print(f"Arguments:\nBLOCKS = {BLOCKS}\nTIMEDELTA = {TIMEDELTA}")
 
     #main work
@@ -277,8 +277,12 @@ Usage: vw mine BLOCKS TIMEDELTA
     accounts = brownie.network.accounts
     chain = brownie.network.chain
     from_account = _getPrivateAccount()
-    chain.mine(blocks=BLOCKS, timedelta=TIMEDELTA)    
-    print("Done.")
+    if TIMEDELTA is None:
+        chain.mine(blocks=BLOCKS)
+        print(f"Just mined {BLOCKS} blocks.")
+    else:
+        chain.mine(blocks=BLOCKS, timedelta=TIMEDELTA)
+        print(f"Just mined {BLOCKS} blocks, timedelta={TIMEDELTA}.")
 
 # ========================================================================
 @enforce_types
@@ -352,21 +356,21 @@ Usage: vw walletinfo TYPE NETWORK WALLET_ADDR [TOKEN_ADDR]
     print(f"Vesting wallet info:")
     print(f"  type = {TYPE}")
     print(f"  address = {WALLET_ADDR}")
-    print(f"  beneficiary = {wallet.beneficiary()}..")
+    print(f"  beneficiary = {wallet.beneficiary()}")
     
     if TYPE == "cliff":
         print(f"  duration = {wallet.duration()} seconds")
         print(f"  start timestamp = {wallet.start()}")
     elif TYPE == "lin":
         print(f"  duration = {fromBase18(wallet.numBlocksDuration())} blocks")
-        print(f"  start block = block {fromBase18(wallet.startBlock())}")
+        print(f"  start block = block {int(fromBase18(wallet.startBlock()))}")
     elif TYPE == "exp":
         print(f"  half life = {fromBase18(wallet.halfLife())} blocks")
-        print(f"  start block = block {fromBase18(wallet.start())}")
+        print(f"  start block = block {int(fromBase18(wallet.start()))}")
         
     if TOKEN_ADDR is not None:
-        print(f"  For token '{token.symbol()}':")
         token = BROWNIE_PROJECT.Simpletoken.at(TOKEN_ADDR)
+        print(f"  for token '{token.symbol()}':")
         amt_vested = wallet.vestedAmount(token.address, chain[-1].timestamp)
         amt_released = wallet.released(token.address)
         print(f"    amt vested: {fromBase18(amt_vested)} {token.symbol()}")

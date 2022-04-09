@@ -176,29 +176,31 @@ Note: alternative to this, any crypto wallet could be used to transfer funds
 def do_release():
     HELP = f"""Request wallet to release funds
 
-Usage: vw release NETWORK TOKEN_ADDR WALLET_ADDR
+Usage: vw release TYPE NETWORK TOKEN_ADDR WALLET_ADDR
+  TYPE -- one of cliff|lin|exp
   NETWORK -- one of {NETWORKS}
   TOKEN_ADDR -- e.g. '0x123..'
   WALLET_ADDR -- vesting wallet, e.g. '0x987...'
 """
-    if len(sys.argv) not in [5]:
+    if len(sys.argv) not in [6]:
         print(HELP)
         sys.exit(0)
 
     # extract inputs
-    NETWORK = sys.argv[2]
-    TOKEN_ADDR = sys.argv[3]
-    WALLET_ADDR = sys.argv[4]
+    TYPE = sys.argv[2]
+    NETWORK = sys.argv[3]
+    TOKEN_ADDR = sys.argv[4]
+    WALLET_ADDR = sys.argv[5]
 
-    print(f"Arguments:\nNETWORK = {NETWORK}\nTOKEN_ADDR = {TOKEN_ADDR}"
-          f"\nWALLET_ADDR = {WALLET_ADDR}")
+    print(f"Arguments:\nTYPE = {TYPE}\nNETWORK = {NETWORK}" 
+          f"\nTOKEN_ADDR = {TOKEN_ADDR}\nWALLET_ADDR = {WALLET_ADDR}")
 
     #main work
     brownie.network.connect(NETWORK) 
     accounts = brownie.network.accounts
     from_account = _getPrivateAccount()
-    vesting_wallet = BROWNIE_PROJECT.VestingWalletCliff.at(WALLET_ADDR)
-    vesting_wallet.release(TOKEN_ADDR, {"from": from_account})
+    wallet = _getWallet(TYPE, WALLET_ADDR)
+    wallet.release(TOKEN_ADDR, {"from": from_account})
     print("Funds have been released.")
 
 # ========================================================================
@@ -337,7 +339,7 @@ Usage: vw walletinfo TYPE NETWORK WALLET_ADDR [TOKEN_ADDR]
     WALLET_ADDR = sys.argv[4]
     TOKEN_ADDR = sys.argv[5] if len(sys.argv)==6 else None
 
-    print(f"Arguments:\nNETWORK={NETWORK}" \
+    print(f"Arguments:\nTYPE = {TYPE}\nNETWORK = {NETWORK}" \
           f"\nWALLET_ADDR = {WALLET_ADDR}" \
           f"\nTOKEN_ADDR = {TOKEN_ADDR}")
     if TYPE not in ["cliff", "lin", "exp"]:
@@ -346,12 +348,7 @@ Usage: vw walletinfo TYPE NETWORK WALLET_ADDR [TOKEN_ADDR]
     #main work
     brownie.network.connect(NETWORK)
     chain = brownie.network.chain
-    if TYPE == "cliff":
-        wallet = BROWNIE_PROJECT.VestingWalletCliff.at(WALLET_ADDR)
-    elif TYPE == "lin":
-        wallet = BROWNIE_PROJECT.VestingWalletLinear.at(WALLET_ADDR)
-    elif TYPE == "exp":
-        wallet = BROWNIE_PROJECT.VestingWalletExp.at(WALLET_ADDR)
+    wallet = _getWallet(TYPE, WALLET_ADDR)
         
     print(f"Vesting wallet info:")
     print(f"  type = {TYPE}")
@@ -408,6 +405,16 @@ def _getPrivateAccount():
     account = brownie.network.accounts.add(private_key=private_key)
     print(f"For VW_PRIVATE_KEY, address is: {account.address}")
     return account
+
+def _getWallet(_type, wallet_addr):
+    if _type == "cliff":
+        return BROWNIE_PROJECT.VestingWalletCliff.at(wallet_addr)
+    elif _type == "lin":
+        return BROWNIE_PROJECT.VestingWalletLinear.at(wallet_addr)
+    elif _type == "exp":
+        return BROWNIE_PROJECT.VestingWalletExp.at(wallet_addr)
+    else:
+        raise ValueError(_type)
 
 # ========================================================================
 # main

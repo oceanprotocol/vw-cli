@@ -16,10 +16,6 @@ Other features:
 - Via [brownie](https://eth-brownie.readthedocs.io/en/latest/), easy to interact with contract in console
 - Thorough unit tests
 
-Potential future features:
-
-- Usage requires `git clone` etc. Could add to pip, or make it a fully independent tool
-
 # Installation
 
 Ensure pre-requisites:

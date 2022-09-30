@@ -149,6 +149,85 @@ def test_tokenFunding():
     )  # beneficiary richer
 
 
+def test_tokenFunding_big_supply():
+    # supply is 1.41B tokens
+    supply = toBase18(1.41e9)
+
+    token = BROWNIE_PROJECT.Simpletoken.deploy(
+        "TOK", "Test Token", 18, supply, {"from": account0}
+    )
+    token.transfer(account1, toBase18(100.0), {"from": account0})
+    token.transfer(account2, toBase18(100.0), {"from": account0})
+    taddress = token.address
+
+    assert token.balanceOf(account1) / 1e18 == approx(100.0)
+    assert token.balanceOf(account2) / 1e18 == approx(100.0)
+
+    # set up vesting wallet (account). It vests all ETH/tokens that it receives.
+    start_block = toBase18(len(chain))
+    half_life = toBase18(50)
+    half_life_int = int(fromBase18(half_life))
+    wallet = BROWNIE_PROJECT.VestingWalletHalving.deploy(
+        address1,
+        start_block,
+        half_life,
+        {"from": account0},
+    )
+    assert token.balanceOf(wallet) == 0
+
+    # send TOK to the wallet
+    token.transfer(wallet.address, token.balanceOf(account0), {"from": account0})
+
+    # Check vested amounts
+    assert wallet.vestedAmount(taddress, start_block) == 0
+    assert wallet.vestedAmount(taddress, toBase18(10) + start_block) > 0.0
+    assert wallet.released(taddress) == 0
+
+    assert wallet.vestedAmount(taddress, toBase18(1)) == 0
+    assert wallet.vestedAmount(taddress, toBase18(2)) == 0
+    assert wallet.vestedAmount(taddress, toBase18(3)) == 0
+    assert wallet.vestedAmount(taddress, toBase18(4)) == 0
+
+    for i in range(half_life_int):
+        contract_amt = fromBase18(
+            wallet.vestedAmount(taddress, start_block + toBase18(i))
+        )
+        approx_amt = _approx(fromBase18(supply), i, half_life_int)
+        assert contract_amt == approx(
+            approx_amt, 1e-5
+        ), f"{i} {contract_amt} {approx_amt}"
+
+    assert wallet.released(taddress) == 0
+    assert token.balanceOf(account1) == toBase18(100.0)  # not released yet
+
+    # forward time and release funds
+    chain.mine(blocks=half_life_int - 2, timedelta=1)
+    balance_before = token.balanceOf(account1)
+    current_vested_amount = wallet.vestedAmount(taddress, toBase18(len(chain)))
+    assert fromBase18(current_vested_amount) == approx(fromBase18(supply / 2))
+
+    tx = wallet.release(taddress, {"from": account1})
+    # get event
+    event = tx.events["ERC20Released"]
+    amount = event["amount"]
+    assert fromBase18(amount) == approx(fromBase18(current_vested_amount))
+    assert fromBase18(token.balanceOf(account1)) == approx(
+        fromBase18(balance_before + supply / 2)
+    )  # released!
+
+    # forward time and release most of the funds
+    chain.mine(blocks=500, timedelta=1)
+
+    # release the TOK. Anyone can call it
+    wallet.release(taddress, {"from": account2})
+    assert wallet.released(taddress) / 1e18 == approx(
+        fromBase18(supply), 0.1
+    )  # released!
+    assert token.balanceOf(account1) / 1e18 == approx(
+        110.0 + fromBase18(supply), 0.1
+    )  # beneficiary richer
+
+
 def _approx(value, t, h):
     t = int(t)
     h = int(h)

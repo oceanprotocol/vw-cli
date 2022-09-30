@@ -8,7 +8,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/Context.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/math/SafeMath.sol";
 
 /**
- * @title VestingWalletExp
+ * @title VestingWalletHalving
  * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
  * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
@@ -17,7 +17,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/math/SafeMath.
  * Consequently, if the vesting has already started, any amount of tokens sent to this contract will (at least partly)
  * be immediately releasable.
  */
-contract VestingWalletExp is Context {
+contract VestingWalletHalving is Context {
     event EtherReleased(uint256 amount);
     event ERC20Released(address indexed token, uint256 amount);
 
@@ -115,6 +115,7 @@ contract VestingWalletExp is Context {
 
 
     function getAmount(uint256 value, uint256 t, uint256 h) public pure returns (uint256) {
+        // approximates (1-(0.5^(t/h)))*value
         uint256 p = value >> (t / h);
         t %= h;
         return value - p + (p * t) / h / 2;

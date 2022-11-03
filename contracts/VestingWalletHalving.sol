@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts v4.4.0 (finance/VestingWallet.sol)
+// OpenZeppelin Contracts (last updated v4.7.0) (finance/VestingWallet.sol)
 pragma solidity ^0.8.0;
 
 import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/token/ERC20/utils/SafeERC20.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/Address.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/Context.sol";
-import "OpenZeppelin/openzeppelin-contracts@4.0.0/contracts/utils/math/SafeMath.sol";
 
 /**
  * @title VestingWalletHalving
@@ -24,20 +23,23 @@ contract VestingWalletHalving is Context {
     uint256 private _released;
     mapping(address => uint256) private _erc20Released;
     address private immutable _beneficiary;
-    uint256 private immutable _startBlock;
+    uint64 private immutable _start;
     uint256 private immutable _halfLife;
 
     /**
-     * @dev Set the beneficiary, start blockNumber and vesting duration of the vesting wallet.
+     * @dev Set the beneficiary, start timestamp and vesting duration of the vesting wallet.
      */
     constructor(
         address beneficiaryAddress,
-        uint256 startBlock,
+        uint64 startTimestamp,
         uint256 halfLife
-    ) {
-        require(beneficiaryAddress != address(0), "VestingWalletLinear: beneficiary is zero address");
+    ) payable {
+        require(
+            beneficiaryAddress != address(0),
+            "VestingWallet: beneficiary is zero address"
+        );
         _beneficiary = beneficiaryAddress;
-        _startBlock = startBlock;
+        _start = startTimestamp;
         _halfLife = halfLife;
     }
 
@@ -54,13 +56,12 @@ contract VestingWalletHalving is Context {
     }
 
     /**
-     * @dev Getter for the start blockNumber.
+     * @dev Getter for the start timestamp.
      */
-    function startBlock() public view virtual returns (uint256) {
-        return _startBlock;
+    function start() public view virtual returns (uint256) {
+        return _start;
     }
 
- 
     /**
      * @dev Amount of eth already released
      */
@@ -76,62 +77,98 @@ contract VestingWalletHalving is Context {
     }
 
     /**
+     * @dev Getter for the amount of releasable eth.
+     */
+    function releasable() public view virtual returns (uint256) {
+        return vestedAmount(uint64(block.timestamp)) - released();
+    }
+
+    /**
+     * @dev Getter for the amount of releasable `token` tokens. `token` should be the address of an
+     * IERC20 contract.
+     */
+    function releasable(address token) public view virtual returns (uint256) {
+        return vestedAmount(token, uint64(block.timestamp)) - released(token);
+    }
+
+    /**
      * @dev Release the native token (ether) that have already vested.
      *
-     * Emits a {TokensReleased} event.
+     * Emits a {EtherReleased} event.
      */
     function release() public virtual {
-        uint256 releasable = vestedAmount(uint256(block.number*10**18)) - released();
-        _released += releasable;
-        emit EtherReleased(releasable);
-        Address.sendValue(payable(beneficiary()), releasable);
+        uint256 amount = releasable();
+        _released += amount;
+        emit EtherReleased(amount);
+        Address.sendValue(payable(beneficiary()), amount);
     }
 
     /**
      * @dev Release the tokens that have already vested.
      *
-     * Emits a {TokensReleased} event.
+     * Emits a {ERC20Released} event.
      */
     function release(address token) public virtual {
-        uint256 releasable = vestedAmount(token, uint256(block.number*10**18)) - released(token);
-        _erc20Released[token] += releasable;
-        emit ERC20Released(token, releasable);
-        SafeERC20.safeTransfer(IERC20(token), beneficiary(), releasable);
+        uint256 amount = releasable(token);
+        _erc20Released[token] += amount;
+        emit ERC20Released(token, amount);
+        SafeERC20.safeTransfer(IERC20(token), beneficiary(), amount);
     }
 
     /**
      * @dev Calculates the amount of ether that has already vested. Default implementation is a linear vesting curve.
      */
-    function vestedAmount(uint256 blockNumber) public view virtual returns (uint256) {
-        return _vestingSchedule(address(this).balance + released(), blockNumber);
+    function vestedAmount(uint64 timestamp)
+        public
+        view
+        virtual
+        returns (uint256)
+    {
+        return _vestingSchedule(address(this).balance + released(), timestamp);
     }
 
     /**
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
      */
-    function vestedAmount(address token, uint256 blockNumber) public view virtual returns (uint256) {
-        return _vestingSchedule(IERC20(token).balanceOf(address(this)) + released(token), blockNumber);
+    function vestedAmount(address token, uint64 timestamp)
+        public
+        view
+        virtual
+        returns (uint256)
+    {
+        return
+            _vestingSchedule(
+                IERC20(token).balanceOf(address(this)) + released(token),
+                timestamp
+            );
     }
 
-
-    function getAmount(uint256 value, uint256 t, uint256 h) public pure returns (uint256) {
+    function getAmount(
+        uint256 value,
+        uint256 t,
+        uint256 h
+    ) public pure returns (uint256) {
         // approximates (1-(0.5^(t/h)))*value
         uint256 p = value >> (t / h);
         t %= h;
         return value - p + (p * t) / h / 2;
     }
 
-
     /**
-     * @dev Virtual implementation of the vesting formula. This returns the amout vested, as a function of time, for
+     * @dev Virtual implementation of the vesting formula. This returns the amount vested, as a function of time, for
      * an asset given its total historical allocation.
      */
-    function _vestingSchedule(uint256 totalAllocation, uint256 blockNumber) internal view virtual returns (uint256) {
-        if (blockNumber < startBlock()) {
+    function _vestingSchedule(uint256 totalAllocation, uint64 timestamp)
+        internal
+        view
+        virtual
+        returns (uint256)
+    {
+        if (timestamp < start()) {
             return 0;
         } else {
-            uint256 blocksPassed = blockNumber - startBlock();
-            return getAmount(totalAllocation, blocksPassed, _halfLife);
+            uint256 timePassed = timestamp - start();
+            return getAmount(totalAllocation, timePassed, _halfLife);
         }
     }
 }

@@ -36,7 +36,7 @@ contract VestingWalletCliff is Context {
     ) payable {
         require(
             beneficiaryAddress != address(0),
-            "VestingWallet: beneficiary is zero address"
+            "VestingWalletCliff: beneficiary is zero address"
         );
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;

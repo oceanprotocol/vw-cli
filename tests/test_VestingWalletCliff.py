@@ -8,10 +8,11 @@ accounts = brownie.network.accounts
 chain = brownie.network.chain
 GOD_ACCOUNT = accounts[9]
 
+
 def test_init():
     vesting_wallet = _vesting_wallet()
     assert vesting_wallet.beneficiary() == accounts[1].address
-    assert vesting_wallet.start() > chain[-1].timestamp
+    assert vesting_wallet.start() > chain[-2].timestamp
     assert vesting_wallet.duration() == 30
     assert vesting_wallet.released() == 0
 
@@ -52,7 +53,7 @@ def test_ethFunding():
     accounts[0].transfer(wallet.address, "30 ether")
     assert accounts[0].balance() / 1e18 == approx(0.0)
     assert accounts[1].balance() / 1e18 == approx(30.0)  # unchanged so far
-    assert wallet.vestedAmount(chain[1].timestamp) == 0
+    assert wallet.vestedAmount(start_timestamp + 5) == 0
     assert wallet.released() == 0
 
     # make enough time pass for everything to vest

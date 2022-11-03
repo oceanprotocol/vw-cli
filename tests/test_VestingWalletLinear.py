@@ -15,24 +15,24 @@ address0, address1, address2 = account0.address, account1.address, account2.addr
 chain = brownie.network.chain
 GOD_ACCOUNT = accounts[9]
 
+
 def test_basic():
-    n_blocks = len(chain)
     beneficiary = address1
-    start_block = n_blocks + 1
-    num_blocks_duration = 4
+    start_ts = chain.time()
+    ts_duration = 4
 
     # constructor
     vw = BROWNIE_PROJECT.VestingWalletLinear.deploy(
         beneficiary,
-        toBase18(start_block),
-        toBase18(num_blocks_duration),
+        start_ts,
+        ts_duration,
         {"from": account0},
     )
 
     assert vw.beneficiary() == beneficiary
-    start_block_measured = int(vw.startBlock() / 1e18)
-    assert start_block_measured in [start_block - 1, start_block, start_block + 1]
-    assert int(vw.numBlocksDuration() / 1e18) == 4
+    start_block_measured = vw.start()
+    assert start_block_measured in [start_ts - 1, start_ts, start_ts + 1]
+    assert vw.duration() == 4
     assert vw.released() == 0
 
     # time passes
@@ -58,12 +58,12 @@ def test_ethFunding():
 
     # set up vesting wallet (account). It vests all ETH/tokens that it receives.
     # where beneficiary is account1
-    start_block = 4
-    num_blocks_duration = 5
+    start_ts = start_ts = chain.time()
+    ts_duration = 5
     wallet = BROWNIE_PROJECT.VestingWalletLinear.deploy(
         address1,
-        toBase18(start_block),
-        toBase18(num_blocks_duration),
+        start_ts,
+        ts_duration,
         {"from": account0},
     )
     assert wallet.balance() == 0
@@ -77,24 +77,24 @@ def test_ethFunding():
     assert wallet.balance() / 1e18 == approx(30.0)
     assert account0.balance() / 1e18 == approx(0.0)
     assert account1.balance() / 1e18 == approx(30.0)  # unchanged so far
-    assert wallet.vestedAmount(toBase18(4)) == 0
-    assert wallet.vestedAmount(toBase18(10)) > 0.0
+    assert wallet.vestedAmount(start_ts) == 0
+    assert wallet.vestedAmount(start_ts + 10) > 0.0
     assert wallet.released() == 0
 
     # make enough time pass for everything to vest
     chain.mine(blocks=14, timedelta=100)
 
-    assert wallet.vestedAmount(toBase18(1)) == 0
-    assert wallet.vestedAmount(toBase18(2)) == 0
-    assert wallet.vestedAmount(toBase18(3)) == 0
-    assert wallet.vestedAmount(toBase18(4)) == 0
-    assert wallet.vestedAmount(toBase18(5)) / 1e18 == approx(6.0)
-    assert wallet.vestedAmount(toBase18(6)) / 1e18 == approx(12.0)
-    assert wallet.vestedAmount(toBase18(7)) / 1e18 == approx(18.0)
-    assert wallet.vestedAmount(toBase18(8)) / 1e18 == approx(24.0)
-    assert wallet.vestedAmount(toBase18(9)) / 1e18 == approx(30.0)
-    assert wallet.vestedAmount(toBase18(10)) / 1e18 == approx(30.0)
-    assert wallet.vestedAmount(toBase18(11)) / 1e18 == approx(30.0)
+    assert wallet.vestedAmount(1) == 0
+    assert wallet.vestedAmount(2) == 0
+    assert wallet.vestedAmount(3) == 0
+    assert wallet.vestedAmount(start_ts) == 0
+    assert wallet.vestedAmount(start_ts + 1) / 1e18 == approx(6.0)
+    assert wallet.vestedAmount(start_ts + 2) / 1e18 == approx(12.0)
+    assert wallet.vestedAmount(start_ts + 3) / 1e18 == approx(18.0)
+    assert wallet.vestedAmount(start_ts + 4) / 1e18 == approx(24.0)
+    assert wallet.vestedAmount(start_ts + 5) / 1e18 == approx(30.0)
+    assert wallet.vestedAmount(start_ts + 6) / 1e18 == approx(30.0)
+    assert wallet.vestedAmount(start_ts + 7) / 1e18 == approx(30.0)
 
     assert wallet.released() == 0
     assert account1.balance() / 1e18 == approx(30.0)  # not released yet!
@@ -106,7 +106,7 @@ def test_ethFunding():
 
     # put some new ETH into wallet. It's immediately vested, but not released
     account2.transfer(wallet.address, toBase18(10.0))
-    assert wallet.vestedAmount(toBase18(len(chain))) / 1e18 == approx(30.0 + 10.0)
+    assert wallet.vestedAmount(chain.time()) / 1e18 == approx(30.0 + 10.0)
     assert wallet.released() / 1e18 == approx(30.0 + 0.0)  # not released yet!
 
     # release the new ETH
@@ -134,12 +134,12 @@ def test_tokenFunding():
     assert token.balanceOf(account1) / 1e18 == approx(110.0)
 
     # set up vesting wallet (account). It vests all ETH/tokens that it receives.
-    start_block = 4
-    num_blocks_duration = 5
+    start_ts = chain.time()
+    ts_duration = 5
     wallet = BROWNIE_PROJECT.VestingWalletLinear.deploy(
         address1,
-        toBase18(start_block),
-        toBase18(num_blocks_duration),
+        start_ts,
+        ts_duration,
         {"from": account0},
     )
     assert token.balanceOf(wallet) == 0
@@ -149,24 +149,25 @@ def test_tokenFunding():
     assert token.balanceOf(wallet) / 1e18 == approx(30.0)
     assert token.balanceOf(account0) / 1e18 == approx(60.0)
     assert token.balanceOf(account1) / 1e18 == approx(110.0)
-    assert wallet.vestedAmount(taddress, toBase18(4)) == 0
-    assert wallet.vestedAmount(taddress, toBase18(10)) > 0.0
+    assert wallet.vestedAmount(taddress, start_ts) == 0
+    assert wallet.vestedAmount(taddress, start_ts + 6) > 0.0
     assert wallet.released(taddress) == 0
 
     # make enough time pass for everything to vest
-    chain.mine(blocks=14, timedelta=100)
+    chain.sleep(14)
+    chain.mine(1)
 
-    assert wallet.vestedAmount(taddress, toBase18(1)) == 0
-    assert wallet.vestedAmount(taddress, toBase18(2)) == 0
-    assert wallet.vestedAmount(taddress, toBase18(3)) == 0
-    assert wallet.vestedAmount(taddress, toBase18(4)) == 0
-    assert wallet.vestedAmount(taddress, toBase18(5)) / 1e18 == approx(6.0)
-    assert wallet.vestedAmount(taddress, toBase18(6)) / 1e18 == approx(12.0)
-    assert wallet.vestedAmount(taddress, toBase18(7)) / 1e18 == approx(18.0)
-    assert wallet.vestedAmount(taddress, toBase18(8)) / 1e18 == approx(24.0)
-    assert wallet.vestedAmount(taddress, toBase18(9)) / 1e18 == approx(30.0)
-    assert wallet.vestedAmount(taddress, toBase18(10)) / 1e18 == approx(30.0)
-    assert wallet.vestedAmount(taddress, toBase18(11)) / 1e18 == approx(30.0)
+    assert wallet.vestedAmount(taddress, start_ts - 3) == 0
+    assert wallet.vestedAmount(taddress, start_ts - 2) == 0
+    assert wallet.vestedAmount(taddress, start_ts - 1) == 0
+    assert wallet.vestedAmount(taddress, start_ts) == 0
+    assert wallet.vestedAmount(taddress, start_ts + 1) / 1e18 == approx(6.0)
+    assert wallet.vestedAmount(taddress, start_ts + 2) / 1e18 == approx(12.0)
+    assert wallet.vestedAmount(taddress, start_ts + 3) / 1e18 == approx(18.0)
+    assert wallet.vestedAmount(taddress, start_ts + 4) / 1e18 == approx(24.0)
+    assert wallet.vestedAmount(taddress, start_ts + 5) / 1e18 == approx(30.0)
+    assert wallet.vestedAmount(taddress, start_ts + 6) / 1e18 == approx(30.0)
+    assert wallet.vestedAmount(taddress, start_ts + 7) / 1e18 == approx(30.0)
 
     assert wallet.released(taddress) == 0
     assert token.balanceOf(account1) / 1e18 == approx(110.0)  # not released yet

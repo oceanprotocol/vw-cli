@@ -17,7 +17,7 @@ HELP_MAIN = """Vesting wallet
 
 Usage for funder:
   vw new_cliff NETWORK TO_ADDR LOCK_TIME - create new cliff wallet (timelock)
-  vw new_lin   NETWORK TO_ADDR VEST_BLOCKS - create new linear-vesting wallet
+  vw new_lin   NETWORK TO_ADDR LOCK_TIME - create new linear-vesting wallet
   vw new_exp   NETWORK TO_ADDR HALF_LIFE - create new exp'l-vesting wallet
 
   vw transfer NETWORK WALLET_ADDR TOKEN_ADDR TOKEN_AMT - transfer funds to wallet
@@ -79,10 +79,10 @@ Usage: vw new_cliff NETWORK TO_ADDR LOCK_TIME
 def do_new_lin():
     HELP = f"""Create new linear-vesting wallet. **EXPERIMENTAL!**
 
-Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
+Usage: vw new_lin NETWORK TO_ADDR LOCK_TIME
   NETWORK -- one of {NETWORKS}
   TO_ADDR -- address of beneficiary
-  VEST_BLOCKS -- number of blocks to vest over
+  LOCK_TIME -- Eg '10' (10 seconds) or '63113852' (2 years)
 """
     if len(sys.argv) not in [5]:
         print(HELP); sys.exit(0)
@@ -90,16 +90,16 @@ Usage: vw new_lin NETWORK TO_ADDR VEST_BLOCKS
     #extract inputs
     NETWORK = sys.argv[2]
     TO_ADDR = sys.argv[3]
-    VEST_BLOCKS = int(sys.argv[4])
+    LOCK_TIME = int(sys.argv[4])
     print(f"Arguments: \nNETWORK = {NETWORK}\n TO_ADDR = {TO_ADDR}" \
-          f"\nVEST_BLOCKS = {VEST_BLOCKS}")
+          f"\nLOCK_TIME = {LOCK_TIME}")
     
     #main work
     brownie.network.connect(NETWORK)
-    start_block = len(brownie.network.chain) + 1
+    start_timestamp = brownie.network.chain[-1].timestamp + 1
     from_account = _getPrivateAccount()
     wallet = B.VestingWalletLinear.deploy(
-        TO_ADDR, toBase18(start_block), toBase18(VEST_BLOCKS),
+        TO_ADDR, start_timestamp, LOCK_TIME,
         {"from": from_account})
     print(f"Created new linear wallet:")
     print(f" address = { wallet.address}")
@@ -114,26 +114,24 @@ def do_new_exp():
 Usage: vw new_exp NETWORK TO_ADDR HALF_LIFE
   NETWORK -- one of {NETWORKS}
   TO_ADDR -- address of beneficiary
-  HALF_LIFE -- number of *blocks* for the first 50% to vest
+  HALF_LIFE -- time in seconds for the first 50% to vest
 """
-    if len(sys.argv) not in [6]:
+    if len(sys.argv) not in [5]:
         print(HELP); sys.exit(0)
 
     #extract inputs
     NETWORK = sys.argv[2]
     TO_ADDR = sys.argv[3]
-    HALF_LIFE = int(sys.argv[4])
+    LOCK_TIME = int(sys.argv[4])
     print(f"Arguments: \nNETWORK = {NETWORK}\n TO_ADDR = {TO_ADDR}" \
-          f"\nHALF_LIFE = {HALF_LIFE}")
+          f"\nLOCK_TIME = {LOCK_TIME}")
     
     #main work
     brownie.network.connect(NETWORK)
-    start_block = len(brownie.network.chain) + 1
+    start_timestamp = brownie.network.chain[-1].timestamp + 1
     from_account = _getPrivateAccount()
-    print("Need to implement VestingWalletExp.sol. Exiting."); sys.exit(0)
-    wallet = B.VestingWalletExp.deploy(
-        TO_ADDR, toBase18(start_block), toBase18(HALF_LIFE),
-        {"from": from_account})
+    wallet = B.VestingWalletHalving.deploy(
+        TO_ADDR, start_timestamp, LOCK_TIME, {"from": from_account})
     print(f"Created new exponential wallet:")
     print(f" address = {wallet.address}")
     print(f" created from account = {from_account.address}")

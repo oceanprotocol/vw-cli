@@ -14,6 +14,7 @@ account0, account1, account2, account3 = (
 address0, address1, address2 = account0.address, account1.address, account2.address
 chain = brownie.network.chain
 GOD_ACCOUNT = accounts[9]
+DURATION = 10000000000
 
 
 def test_basic():
@@ -27,6 +28,7 @@ def test_basic():
         beneficiary,
         start_ts,
         half_life,
+        DURATION
         {"from": account0},
     )
 
@@ -70,6 +72,7 @@ def test_tokenFunding():
         address1,
         start_ts,
         half_life,
+        DURATION
         {"from": account0},
     )
     assert token.balanceOf(wallet) == 0
@@ -173,6 +176,7 @@ def test_tokenFunding_big_supply():
         address1,
         start_ts,
         half_life,
+        DURATION
         {"from": account0},
     )
     assert token.balanceOf(wallet) == 0

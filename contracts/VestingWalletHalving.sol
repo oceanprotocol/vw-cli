@@ -25,6 +25,7 @@ contract VestingWalletHalving is Context {
     address private immutable _beneficiary;
     uint64 private immutable _start;
     uint256 private immutable _halfLife;
+    uint256 private immutable _duration;
 
     /**
      * @dev Set the beneficiary, start timestamp and vesting duration of the vesting wallet.
@@ -32,7 +33,8 @@ contract VestingWalletHalving is Context {
     constructor(
         address beneficiaryAddress,
         uint64 startTimestamp,
-        uint256 halfLife
+        uint256 halfLife,
+        uint256 duration
     ) payable {
         require(
             beneficiaryAddress != address(0),
@@ -41,6 +43,7 @@ contract VestingWalletHalving is Context {
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;
         _halfLife = halfLife;
+        _duration = duration;
     }
 
     /**
@@ -166,6 +169,8 @@ contract VestingWalletHalving is Context {
     {
         if (timestamp < start()) {
             return 0;
+        } else if (timestamp > start() + _duration) {
+            return totalAllocation;
         } else {
             uint256 timePassed = timestamp - start();
             return getAmount(totalAllocation, timePassed, _halfLife);

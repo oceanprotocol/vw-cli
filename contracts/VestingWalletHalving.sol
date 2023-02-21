@@ -146,6 +146,15 @@ contract VestingWalletHalving is Context {
             );
     }
 
+    function halfLife() public view returns (uint256) {
+        return _halfLife;
+    }
+
+    function duration() public view returns (uint256) {
+        return _duration;
+    }
+
+
     function getAmount(
         uint256 value,
         uint256 t,
@@ -169,11 +178,11 @@ contract VestingWalletHalving is Context {
     {
         if (timestamp < start()) {
             return 0;
-        } else if (timestamp > start() + _duration) {
+        } else if (timestamp > start() + duration()) {
             return totalAllocation;
         } else {
             uint256 timePassed = timestamp - start();
-            return getAmount(totalAllocation, timePassed, _halfLife);
+            return getAmount(totalAllocation, timePassed, halfLife());
         }
     }
 }

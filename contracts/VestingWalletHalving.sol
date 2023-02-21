@@ -66,6 +66,20 @@ contract VestingWalletHalving is Context {
     }
 
     /**
+     * @dev Getter for the half life.
+     */
+    function halfLife() public view returns (uint256) {
+        return _halfLife;
+    }
+
+    /**
+     * @dev Getter for duration.
+     */
+    function duration() public view returns (uint256) {
+        return _duration;
+    }
+
+    /**
      * @dev Amount of eth already released
      */
     function released() public view virtual returns (uint256) {
@@ -145,15 +159,6 @@ contract VestingWalletHalving is Context {
                 timestamp
             );
     }
-
-    function halfLife() public view returns (uint256) {
-        return _halfLife;
-    }
-
-    function duration() public view returns (uint256) {
-        return _duration;
-    }
-
 
     function getAmount(
         uint256 value,

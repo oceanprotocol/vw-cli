@@ -112,7 +112,7 @@ Transaction sent: 0x3f113379b70d00041068b27733c37c2977354d8c70cb0b30b0af3087fca9
 
 # License
 
-    Copyright ((C)) 2022 Ocean Protocol Foundation
+    Copyright ((C)) 2023 Ocean Protocol Foundation
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

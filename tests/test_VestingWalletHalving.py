@@ -28,7 +28,7 @@ def test_basic():
         beneficiary,
         start_ts,
         half_life,
-        DURATION
+        DURATION,
         {"from": account0},
     )
 
@@ -72,7 +72,7 @@ def test_tokenFunding():
         address1,
         start_ts,
         half_life,
-        DURATION
+        DURATION,
         {"from": account0},
     )
     assert token.balanceOf(wallet) == 0
@@ -176,7 +176,7 @@ def test_tokenFunding_big_supply():
         address1,
         start_ts,
         half_life,
-        DURATION
+        DURATION,
         {"from": account0},
     )
     assert token.balanceOf(wallet) == 0

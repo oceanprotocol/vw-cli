@@ -154,6 +154,33 @@ def test_tokenFunding():
         110 + 30 + 10.0, 0.1
     )  # beneficiary richer
 
+def test_duration():
+    supply = toBase18(1000)
+    token = BROWNIE_PROJECT.Simpletoken.deploy(
+        "TOK", "Test Token", 18, supply, {"from": account0}
+    )
+    taddress = token.address
+    start_ts = chain.time()
+    half_life = 2500
+    duration = 5000
+    wallet = BROWNIE_PROJECT.VestingWalletHalving.deploy(
+        address1,
+        start_ts,
+        half_life,
+        duration,
+        {"from": account0},
+    )
+    token.transfer(wallet.address, token.balanceOf(account0), {"from": account0})
+
+    chain.sleep(duration + 100)
+    chain.mine(1)
+
+    wallet.release(taddress, {"from": account2})
+    assert wallet.released(taddress) == supply
+    assert token.balanceOf(account1) == supply
+
+
+
 
 def test_tokenFunding_big_supply():
     # supply is 1.41B tokens

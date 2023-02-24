@@ -59,9 +59,9 @@ def test_e2e():
 
         vestingwallets.append(wallet)
 
-    # simulate each 7 day for next 8 years
+    # simulate each 7 day for next 9 years
     plts = [[], [], [], []]
-    for z in range(8 * 365 // 7):
+    for z in range(9 * 365 // 7):
         chain.sleep(7 * 24 * 60 * 60)
         chain.mine(blocks=1, timedelta=1)
         ts = chain.time()
@@ -142,7 +142,7 @@ def test_e2e_with_release():
 
     plts = [[], [], [], []]
     # simulate each week for next 9 years
-    for z in range(21 // 7):
+    for z in range(9 * 365 // 7):
         chain.sleep(7 * 24 * 60 * 60)
         chain.mine(blocks=1, timedelta=1)
         ts = chain.time()

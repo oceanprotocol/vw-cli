@@ -32,7 +32,7 @@ contract PaymentSplitter is Context, Ownable {
     event ERC20PaymentReleased(IERC20 indexed token, address to, uint256 amount);
     event PaymentReceived(address from, uint256 amount);
     event PayeeRemoved(address account, uint256 shares);
-    event PayeeShareAdjusted(address account, uint256 shares);
+    event PayeeShareAdjusted(address account, uint256 shares, uint256 oldShares);
 
     uint256 private _totalShares;
     uint256 private _totalReleased;
@@ -242,7 +242,7 @@ contract PaymentSplitter is Context, Ownable {
         _shares[account] = shares_;
         _totalShares = _totalShares - oldShares + shares_;
 
-        emit PayeeShareAdjusted(account, shares_);
+        emit PayeeShareAdjusted(account, shares_, oldShares);
     }
 
     function addPayee(address account, uint256 shares_) external onlyOwner {

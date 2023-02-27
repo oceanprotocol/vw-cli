@@ -237,6 +237,7 @@ contract PaymentSplitter is Context, Ownable {
     function _adjustShare(address account, uint256 shares_) private {
         require(account != address(0), "PaymentSplitter: account is the zero address");
         require(shares_ > 0, "PaymentSplitter: shares are 0");
+        require(_shares[account] > 0, "PaymentSplitter: account has no shares");
 
         uint256 oldShares = _shares[account];
         _shares[account] = shares_;

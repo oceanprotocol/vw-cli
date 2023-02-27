@@ -52,7 +52,7 @@ def test_shares():
     assert router.totalShares() == 200
 
     # try release
-    router.adjustShare(bob, 200, {"from": alice})
+    router.addPayee(bob, 200, {"from": alice})
     alice_before = token.balanceOf(alice)
     router.release(token.address, alice.address, {"from": carol})
     router.release(token.address, bob.address, {"from": alice})

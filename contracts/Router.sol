@@ -52,7 +52,7 @@ contract Router is Ownable {
                 total += payment;
             }
         }
-        emit PaymentReleased(token.address, total);
+        emit PaymentReleased(token, total);
     }
 
      function addPayee(address account, uint256 shares_) external onlyOwner {
@@ -91,12 +91,12 @@ contract Router is Ownable {
             if (_payees[i] == account) {
                 _payees[i] = _payees[_payees.length - 1];
                 _totalShares = _totalShares - _shares[account];
+                emit PayeeRemoved(account, _shares[account]);
                 _shares[account] = 0;
                 _payees.pop();
                 break;
             }
         }
-        emit PayeeRemoved(account, shares_);
     }
 
     function _adjustShare(address account, uint256 shares_) private {
@@ -105,6 +105,7 @@ contract Router is Ownable {
         require(_shares[account] > 0, "Router: account has no shares");
 
         _totalShares = _totalShares - _shares[account];
+        uint256 oldShares = _shares[account];
         _shares[account] = shares_;
         _totalShares = _totalShares + shares_;
         emit PayeeShareAdjusted(account, shares_, oldShares);

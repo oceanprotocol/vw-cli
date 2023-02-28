@@ -47,11 +47,17 @@ contract Router is Ownable {
     }
     // ---------------------------- external functions ----------------------------
     function release(IERC20 token) external {
+        require(_totalShares > 0, "Router: no shares");
         uint256 balance = token.balanceOf(address(this));
         uint256 total = 0;
         for(uint256 i = 0; i < _payees.length; i++) {
             address payee = _payees[i];
-            uint256 payment = balance * _shares[payee] / _totalShares;
+            uint256 payment;
+            if (i == _payees.length - 1){
+                payment = balance - total;
+            } else {
+                payment = balance * _shares[payee] / _totalShares;
+            }
             if (payment > 0) {
                 _released[payee] = _released[payee] + payment;
                 _totalReleased = _totalReleased + payment;

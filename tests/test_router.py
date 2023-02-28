@@ -19,10 +19,6 @@ def test_shares():
     assert router.shares(bob) == 200
     assert router.shares(carol) == 300
 
-    assert router.releasable(token.address, alice) == 100
-    assert router.releasable(token.address, bob) == 200
-    assert router.releasable(token.address, carol) == 300
-
     assert router.totalShares() == 600
 
     # remove bob
@@ -30,10 +26,6 @@ def test_shares():
     assert router.shares(alice) == 100
     assert router.shares(bob) == 0
     assert router.shares(carol) == 300
-
-    assert router.releasable(token.address, alice) == 150
-    assert router.releasable(token.address, bob) == 0
-    assert router.releasable(token.address, carol) == 450
 
     assert router.totalShares() == 400
 
@@ -45,29 +37,31 @@ def test_shares():
     assert router.shares(bob) == 0
     assert router.shares(carol) == 100
 
-    assert router.releasable(token.address, alice) == 300
-    assert router.releasable(token.address, bob) == 0
-    assert router.releasable(token.address, carol) == 300
-
     assert router.totalShares() == 200
 
-    # try release
     router.addPayee(bob, 200, {"from": alice})
     alice_before = token.balanceOf(alice)
-    router.release(token.address, alice.address, {"from": carol})
-    router.release(token.address, bob.address, {"from": alice})
-    router.release(token.address, carol.address, {"from": bob})
+    router.release(token.address, {"from": carol})
     alice_after = token.balanceOf(alice)
 
     assert alice_after - alice_before == 150
     assert token.balanceOf(bob) == 300
     assert token.balanceOf(carol) == 150
 
+    router.removePayee(alice, {"from": alice})
+    router.removePayee(carol, {"from": alice})
+    router.removePayee(bob, {"from": alice})
+
+    router.addPayee(accounts[3], 1000, {"from": alice})
+    assert router.shares(accounts[3]) == 1000
+    assert router.totalShares() == 1000
+
+    router.release(token.address, {"from": carol})
+    assert token.balanceOf(accounts[3]) == 0
+
 
 def _deployRouter(shares, addresses):
-    return BROWNIE_PROJECT.PaymentSplitter.deploy(
-        addresses, shares, {"from": accounts[0]}
-    )
+    return BROWNIE_PROJECT.Router.deploy(addresses, shares, {"from": accounts[0]})
 
 
 def _deployToken():

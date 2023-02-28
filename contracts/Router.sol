@@ -238,9 +238,8 @@ contract PaymentSplitter is Context, Ownable {
         require(shares_ > 0, "PaymentSplitter: shares are 0");
         require(_shares[account] > 0, "PaymentSplitter: account has no shares");
 
-        uint256 oldShares = _shares[account];
+        _totalShares = _totalShares - _shares[account] + shares_;
         _shares[account] = shares_;
-        _totalShares = _totalShares - oldShares + shares_;
 
         emit PayeeShareAdjusted(account, shares_, oldShares);
     }

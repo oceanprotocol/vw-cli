@@ -219,9 +219,8 @@ contract PaymentSplitter is Context, Ownable {
         require(account != address(0), "PaymentSplitter: account is the zero address");
         require(_shares[account] > 0, "PaymentSplitter: account has no shares");
 
-        uint256 shares_ = _shares[account];
+        _totalShares = _totalShares - _shares[account];
         _shares[account] = 0;
-        _totalShares = _totalShares - shares_;
 
         for (uint256 i = 0; i < _payees.length; i++) {
             if (_payees[i] == account) {

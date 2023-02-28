@@ -33,12 +33,17 @@ contract Router is Ownable {
         return _shares[account];
     }
 
+
+    function released(address account) public view returns (uint256) {
+        return _released[account];
+    }
+
     function totalShares() public view returns (uint256) {
         return _totalShares;
     }
 
-    function released(address account) public view returns (uint256) {
-        return _released[account];
+    function totalReleased() public view returns (uint256) {
+        return _totalReleased;
     }
     // ---------------------------- external functions ----------------------------
     function release(IERC20 token) external {

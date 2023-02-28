@@ -37,6 +37,9 @@ contract Router is Ownable {
         return _totalShares;
     }
 
+    function released(address account) public view returns (uint256) {
+        return _released[account];
+    }
     // ---------------------------- external functions ----------------------------
     function release(IERC20 token) external {
         uint256 balance = token.balanceOf(address(this));

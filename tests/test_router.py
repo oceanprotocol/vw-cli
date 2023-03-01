@@ -3,13 +3,13 @@ import brownie
 from util.constants import BROWNIE_PROJECT
 
 accounts = brownie.network.accounts
+alice = accounts[0]
+bob = accounts[1]
+carol = accounts[2]
 
 
 def test_shares():
     token = _deployToken()
-    alice = accounts[0]
-    bob = accounts[1]
-    carol = accounts[2]
     shares = [100, 200, 300]
 
     router = _deployRouter(shares, [alice, bob, carol])
@@ -64,6 +64,87 @@ def test_shares():
 
     router.release(token.address, {"from": carol})
     assert token.balanceOf(accounts[3]) == 0
+
+
+def test_add_zero_shares():
+    router = _deployRouter([100], [alice])
+    with brownie.reverts("Router: shares are 0"):
+        router.addPayee(bob, 0, {"from": alice})
+
+
+def test_remove_nonexistent_payee():
+    router = _deployRouter([100], [alice])
+    with brownie.reverts("Router: account has no shares"):
+        router.removePayee(bob, {"from": alice})
+
+
+def test_adjust_to_zero():
+    router = _deployRouter([100, 200], [alice, bob])
+    with brownie.reverts("Router: shares are 0"):
+        router.adjustShare(bob, 0, {"from": alice})
+
+
+def test_add_payee():
+    token = _deployToken()
+    shares = [100, 200]
+
+    router = _deployRouter(shares, [alice, bob])
+    token.transfer(router, 600, {"from": alice})
+
+    assert router.shares(alice) == 100
+    assert router.shares(bob) == 200
+
+    assert router.totalShares() == 300
+
+    router.addPayee(carol, 100, {"from": alice})
+    assert router.shares(alice) == 100
+    assert router.shares(bob) == 200
+    assert router.shares(carol) == 100
+
+    assert router.totalShares() == 400
+
+
+def test_adjust_nonexistent_payee_shares():
+    router = _deployRouter([100], [alice])
+
+    with brownie.reverts("Router: account has no shares"):
+        router.adjustShare(bob, 100, {"from": alice})
+
+
+def test_adjust_payee_shares():
+    router = _deployRouter([100, 200, 300], [alice, bob, carol])
+
+    router.adjustShare(bob, 100, {"from": alice})
+
+    assert router.shares(alice) == 100
+    assert router.shares(bob) == 100
+    assert router.shares(carol) == 300
+
+    assert router.totalShares() == 500
+
+
+def test_remove_payee():
+    router = _deployRouter([100, 200], [alice, bob])
+
+    router.removePayee(bob, {"from": alice})
+
+    assert router.shares(alice) == 100
+    assert router.shares(bob) == 0
+
+    assert router.totalShares() == 100
+
+
+def test_admin_functions_only_by_admin():
+    router = _deployRouter([100], [alice])
+
+    with brownie.reverts("Ownable: caller is not the owner"):
+        router.addPayee(bob, 50, {"from": bob})
+
+    with brownie.reverts("Ownable: caller is not the owner"):
+        router.removePayee(bob, {"from": bob})
+
+    with brownie.reverts("Ownable: caller is not the owner"):
+        router.adjustShare(bob, 50, {"from": bob})
 
 
 def _deployRouter(shares, addresses):

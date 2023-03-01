@@ -5,8 +5,9 @@ pragma solidity ^0.8.0;
 
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/SafeERC20.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
+import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/security/ReentrancyGuard.sol";
 
-contract Router is Ownable {
+contract Router is Ownable, ReentrancyGuard {
     uint256 private _totalShares;
     mapping(address => uint256) private _totalReleased;
     
@@ -46,7 +47,7 @@ contract Router is Ownable {
         return _totalReleased[token];
     }
     // ---------------------------- external functions ----------------------------
-    function release(IERC20 token) external {
+    function release(IERC20 token) external nonReentrant {
         require(_totalShares > 0, "Router: no shares");
         uint256 balance = token.balanceOf(address(this));
         uint256 total = 0;
@@ -123,6 +124,7 @@ contract Router is Ownable {
         _totalShares = _totalShares + shares_;
         emit PayeeShareAdjusted(account, shares_, oldShares);
     }
+
 
     //---------------------------- fallback ----------------------------
    

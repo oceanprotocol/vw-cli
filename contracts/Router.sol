@@ -8,7 +8,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
 
 contract Router is Ownable {
     uint256 private _totalShares;
-    uint256 private _totalReleased;
+    mapping(address => uint256) private _totalReleased;
     
     event PayeeAdded(address account, uint256 shares);
     event PaymentReleased(IERC20 indexed token, uint256 amount);
@@ -16,7 +16,7 @@ contract Router is Ownable {
     event PayeeShareAdjusted(address account, uint256 shares, uint256 oldShares);
 
     mapping(address => uint256) private _shares;
-    mapping(address => uint256) private _released;
+    mapping(address => mapping(address => uint256)) private _released;
     address[] private _payees;
 
     constructor(address[] memory payees, uint256[] memory shares_) payable {
@@ -34,16 +34,16 @@ contract Router is Ownable {
     }
 
 
-    function released(address account) public view returns (uint256) {
-        return _released[account];
+    function released(address account, address token) public view returns (uint256) {
+        return _released[token][account];
     }
 
     function totalShares() public view returns (uint256) {
         return _totalShares;
     }
 
-    function totalReleased() public view returns (uint256) {
-        return _totalReleased;
+    function totalReleased(address token) public view returns (uint256) {
+        return _totalReleased[token];
     }
     // ---------------------------- external functions ----------------------------
     function release(IERC20 token) external {
@@ -59,12 +59,12 @@ contract Router is Ownable {
                 payment = balance * _shares[payee] / _totalShares;
             }
             if (payment > 0) {
-                _released[payee] = _released[payee] + payment;
-                _totalReleased = _totalReleased + payment;
+                _released[payee][address(token)] = _released[payee][address(token)] + payment;
                 SafeERC20.safeTransfer(token, payee, payment);
                 total += payment;
             }
         }
+        _totalReleased[address(token)] = _totalReleased[address(token)] + total;
         emit PaymentReleased(token, total);
     }
 
@@ -123,6 +123,8 @@ contract Router is Ownable {
         _totalShares = _totalShares + shares_;
         emit PayeeShareAdjusted(account, shares_, oldShares);
     }
+
+    //---------------------------- fallback ----------------------------
    
     receive() external payable virtual {
         revert("Router: cannot receive ether");

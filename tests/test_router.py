@@ -39,7 +39,8 @@ def test_shares():
 
     assert router.totalShares() == 200
 
-    router.addPayee(bob, 200, {"from": alice})
+    router.addPayee(bob, 100, {"from": alice})
+    router.adjustShare(bob, 200, {"from": alice})
     alice_before = token.balanceOf(alice)
     router.release(token.address, {"from": carol})
     alice_after = token.balanceOf(alice)
@@ -47,6 +48,8 @@ def test_shares():
     assert alice_after - alice_before == 150
     assert token.balanceOf(bob) == 300
     assert token.balanceOf(carol) == 150
+
+    assert router.totalReleased() == 600
 
     router.removePayee(alice, {"from": alice})
     router.removePayee(carol, {"from": alice})

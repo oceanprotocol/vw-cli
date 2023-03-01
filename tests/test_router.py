@@ -49,7 +49,10 @@ def test_shares():
     assert token.balanceOf(bob) == 300
     assert token.balanceOf(carol) == 150
 
-    assert router.totalReleased() == 600
+    assert router.totalReleased(token) == 600
+    assert router.released(token, alice) == 150
+    assert router.released(token, bob) == 300
+    assert router.released(token, carol) == 150
 
     router.removePayee(alice, {"from": alice})
     router.removePayee(carol, {"from": alice})

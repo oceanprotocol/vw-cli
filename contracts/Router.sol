@@ -118,10 +118,9 @@ contract Router is Ownable, ReentrancyGuard {
         require(shares_ > 0, "Router: shares are 0");
         require(_shares[account] > 0, "Router: account has no shares");
 
-        _totalShares = _totalShares - _shares[account];
         uint256 oldShares = _shares[account];
         _shares[account] = shares_;
-        _totalShares = _totalShares + shares_;
+        _totalShares = _totalShares - oldShares + shares_;
         emit PayeeShareAdjusted(account, shares_, oldShares);
     }
 

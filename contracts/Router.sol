@@ -18,7 +18,7 @@ contract Router is Ownable, ReentrancyGuard {
 
     mapping(address => uint256) private _shares;
     mapping(address => mapping(address => uint256)) private _released;
-    address[] private _payees;
+    address[] public _payees;
 
     constructor(address[] memory payees, uint256[] memory shares_) payable {
         require(payees.length == shares_.length, "Router: payees and shares length mismatch");

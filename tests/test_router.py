@@ -6,7 +6,7 @@ accounts = brownie.network.accounts
 alice = accounts[0]
 bob = accounts[1]
 carol = accounts[2]
-
+ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 def test_shares():
     token = _deployToken()
@@ -145,6 +145,58 @@ def test_admin_functions_only_by_admin():
 
     with brownie.reverts("Ownable: caller is not the owner"):
         router.adjustShare(bob, 50, {"from": bob})
+
+
+def test_add_zero_address():
+    router = _deployRouter([100], [alice])
+    with brownie.reverts("Router: zero address"):
+        router.addPayee(
+            ZERO_ADDRESS, 50, {"from": alice}
+        )
+
+
+def test_remove_zero_address():
+    router = _deployRouter([100], [alice])
+    with brownie.reverts("Router: zero address"):
+        router.removePayee(
+            ZERO_ADDRESS, {"from": alice}
+        )
+
+
+def test_adjust_zero_address_shares():
+    router = _deployRouter([100], [alice])
+    with brownie.reverts("Router: zero address"):
+        router.adjustShare(
+            ZERO_ADDRESS, 50, {"from": alice}
+        )
+
+
+def test_readd_payee():
+    router = _deployRouter([100, 200], [alice, bob])
+
+    router.removePayee(bob, {"from": alice})
+
+    assert router.shares(alice) == 100
+    assert router.shares(bob) == 0
+
+    assert router.totalShares() == 100
+
+    router.addPayee(bob, 200, {"from": alice})
+
+    assert router.shares(alice) == 100
+    assert router.shares(bob) == 200
+
+    assert router.totalShares() == 300
+
+    with brownie.reverts("Router: account already has shares"):
+        router.addPayee(bob, 200, {"from": alice})
+
+
+
+def test_send_eth_to_contract():
+    router = _deployRouter([100], [alice])
+    with brownie.reverts():
+        alice.transfer(router, 100)
 
 
 def _deployRouter(shares, addresses):

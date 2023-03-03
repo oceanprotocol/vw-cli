@@ -153,7 +153,7 @@ contract Router is Ownable, ReentrancyGuard {
      * @param shares_ The number of shares owned by the payee.
      */
     function _addPayee(address account, uint256 shares_) private {
-        require(account != address(0), "Router: account is the zero address");
+        require(account != address(0), "Router: zero address");
         require(shares_ > 0, "Router: shares are 0");
         require(_shares[account] == 0, "Router: account already has shares");
 
@@ -168,7 +168,7 @@ contract Router is Ownable, ReentrancyGuard {
      * @param account The address of the payee to remove.
      */
     function _removePayee(address account) private {
-        require(account != address(0), "Router: account is the zero address");
+        require(account != address(0), "Router: zero address");
         require(_shares[account] > 0, "Router: account has no shares");
 
         for (uint256 i = 0; i < _payees.length; i++) {
@@ -189,7 +189,7 @@ contract Router is Ownable, ReentrancyGuard {
      * @param shares_ The new number of shares.
      */
     function _adjustShare(address account, uint256 shares_) private {
-        require(account != address(0), "Router: account is the zero address");
+        require(account != address(0), "Router: zero address");
         require(shares_ > 0, "Router: shares are 0");
         require(_shares[account] > 0, "Router: account has no shares");
 

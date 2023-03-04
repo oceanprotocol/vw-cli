@@ -35,7 +35,7 @@ contract Router is Ownable, ReentrancyGuard {
     mapping(address => mapping(address => uint256)) private _released;
 
     // list of payee addresses
-    address[] public _payees;
+    address[] private _payees;
 
     /**
      * @dev Constructor function initializes the payees and their shares.

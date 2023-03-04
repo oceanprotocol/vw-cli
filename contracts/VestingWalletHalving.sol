@@ -160,12 +160,14 @@ contract VestingWalletHalving is Context {
             );
     }
 
+    /**
+     * @dev Approximation of half life formula (1-(0.5^(t/h)))*value
+     */
     function getAmount(
         uint256 value,
         uint256 t,
         uint256 h
     ) public pure returns (uint256) {
-        // approximates (1-(0.5^(t/h)))*value
         uint256 p = value >> (t / h);
         t %= h;
         return value - p + (p * t) / h / 2;

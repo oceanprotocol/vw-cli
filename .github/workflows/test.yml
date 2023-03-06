@@ -1,4 +1,4 @@
-name: Unit Testing and Code Coverage
+name: Unit Testing
 
 on:
   push:
@@ -39,19 +39,10 @@ jobs:
 
       - name: Set up Openzeppelin
         run: |
-          brownie pm install OpenZeppelin/openzeppelin-contracts@4.2.0
-          brownie pm install GNSPS/solidity-bytes-utils@0.8.0
+          brownie pm install OpenZeppelin/openzeppelin-contracts@4.7.0
 
       - name: Make dftool executable
         run: chmod +x dftool
 
       - name: Test with Brownie
-        run: |
-          coverage run --omit="*test*" -m pytest util/test
-          coverage report
-          coverage xml
-
-      - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v2.7.5
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        run: brownie test tests

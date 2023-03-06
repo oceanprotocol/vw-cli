@@ -17,6 +17,8 @@ account0, account1, account2, account3 = (
     accounts[3],
 )
 address0, address1, address2 = account0.address, account1.address, account2.address
+payee1 = address1
+payee2 = address2
 chain = brownie.network.chain
 GOD_ACCOUNT = accounts[9]
 TOT_SUPPLY = 503370000
@@ -30,7 +32,6 @@ sixmonths = 6 * 30 * 24 * 60 * 60
 
 
 def test_e2e():
-    # accounts 0, 1, 2 should each start with 100 TOK
     token = BROWNIE_PROJECT.Simpletoken.deploy(
         "TOK", "Test Token", 18, toBase18(TOT_SUPPLY), {"from": account0}
     )
@@ -109,9 +110,7 @@ def test_e2e():
 
 
 def test_e2e_with_release():
-    # clear plot
-    plt.clf()
-    # accounts 0, 1, 2 should each start with 100 TOK
+    router = _deployRouter([100,100], [payee1, payee2])
     token = BROWNIE_PROJECT.Simpletoken.deploy(
         "TOK", "Test Token", 18, toBase18(TOT_SUPPLY), {"from": account0}
     )
@@ -130,7 +129,7 @@ def test_e2e_with_release():
         SUPPLY = R_SUPPLIES[ratchet_i]
         start_ts = start_times[ratchet_i]
         wallet = BROWNIE_PROJECT.VestingWalletHalving.deploy(
-            address1,
+            router.address,
             start_ts,
             half_life,
             half_life * 3,
@@ -149,7 +148,7 @@ def test_e2e_with_release():
         chain.mine(blocks=1, timedelta=1)
         ts = chain.time()
 
-        bal_before = fromBase18(token.balanceOf(account1))
+        bal_before = fromBase18(token.balanceOf(router))
 
         contract_amts = []
         approx_amts = [
@@ -165,11 +164,20 @@ def test_e2e_with_release():
             contract_amts.append(amt)
             print(R_SUPPLIES[0], ts - start_times[0], half_life, amt)
 
-        bal_after = fromBase18(token.balanceOf(account1))
+        bal_after = fromBase18(token.balanceOf(router))
 
         sum_actual = sum(contract_amts)
 
         assert bal_after - bal_before == approx(sum_actual, 1e-3)
+
+        payee1_before = fromBase18(token.balanceOf(payee1))
+        payee2_before = fromBase18(token.balanceOf(payee2))
+        router.release()
+        payee1_after = fromBase18(token.balanceOf(payee1))
+        payee2_after = fromBase18(token.balanceOf(payee2))
+
+        assert payee1_after - payee1_before == approx(sum_actual / 2, 1e-3)
+        assert payee1_after - payee1_before == payee2_after - payee2_before
 
         for i in range(len(contract_amts)):
             assert contract_amts[i] == approx(
@@ -218,3 +226,6 @@ def _approx(value, t, h):
     p = value >> int(t / h)
     t %= h
     return value - p + (p * t) / h / 2
+
+def _deployRouter(shares, addresses):
+    return BROWNIE_PROJECT.Router.deploy(addresses, shares, {"from": accounts[0]})

@@ -52,13 +52,16 @@ contract Router is Ownable, ReentrancyGuard {
     }
 
     // ---------------------------- getters ----------------------------
+    
     /**
      * @notice Gets payees.
      * @return Array of addresses
      */
-    function getPayees() public view returns (addresses[]) {
-        return payees;
+    function getPayees() public view returns (address[] memory) {
+        return _payees;
     }
+
+
     /**
      * @notice Gets the number of shares held by a payee.
      * @param account The address of the payee.

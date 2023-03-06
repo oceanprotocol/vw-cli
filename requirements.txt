@@ -1,2 +1,4 @@
 eth-brownie
 enforce_typing
+matplotlib
+numpy

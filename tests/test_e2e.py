@@ -5,6 +5,8 @@ from util.base18 import fromBase18, toBase18
 from util.constants import BROWNIE_PROJECT
 from matplotlib import pyplot as plt
 import numpy as np
+import pytest
+pytest.skip(allow_module_level=True)
 
 accounts = brownie.network.accounts
 

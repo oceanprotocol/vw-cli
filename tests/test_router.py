@@ -196,7 +196,7 @@ def test_readd_payee():
 def test_send_eth_to_contract():
     router = _deployRouter([100], [alice])
     with brownie.reverts():
-        alice.transfer(router, 100)
+        bob.transfer(router, 100)
 
 
 def _deployRouter(shares, addresses):

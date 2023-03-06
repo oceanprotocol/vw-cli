@@ -5,8 +5,6 @@ from util.base18 import fromBase18, toBase18
 from util.constants import BROWNIE_PROJECT
 from matplotlib import pyplot as plt
 import numpy as np
-import pytest
-pytest.skip(allow_module_level=True)
 
 accounts = brownie.network.accounts
 
@@ -110,7 +108,7 @@ def test_e2e():
 
 
 def test_e2e_with_release():
-    router = _deployRouter([100,100], [payee1, payee2])
+    router = _deployRouter([100, 100], [payee1, payee2])
     token = BROWNIE_PROJECT.Simpletoken.deploy(
         "TOK", "Test Token", 18, toBase18(TOT_SUPPLY), {"from": account0}
     )
@@ -172,7 +170,7 @@ def test_e2e_with_release():
 
         payee1_before = fromBase18(token.balanceOf(payee1))
         payee2_before = fromBase18(token.balanceOf(payee2))
-        router.release()
+        router.release(taddress, {"from": account0})
         payee1_after = fromBase18(token.balanceOf(payee1))
         payee2_after = fromBase18(token.balanceOf(payee2))
 
@@ -226,6 +224,7 @@ def _approx(value, t, h):
     p = value >> int(t / h)
     t %= h
     return value - p + (p * t) / h / 2
+
 
 def _deployRouter(shares, addresses):
     return BROWNIE_PROJECT.Router.deploy(addresses, shares, {"from": accounts[0]})

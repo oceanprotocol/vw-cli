@@ -7,7 +7,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Address.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
 
 /**
- * @title VestingWalletLinear
+ * @title VestingWalletHalving
  * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
  * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
@@ -16,7 +16,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
  * Consequently, if the vesting has already started, any amount of tokens sent to this contract will (at least partly)
  * be immediately releasable.
  */
-contract VestingWalletLinear is Context {
+contract VestingWalletHalving is Context {
     event EtherReleased(uint256 amount);
     event ERC20Released(address indexed token, uint256 amount);
 
@@ -24,7 +24,8 @@ contract VestingWalletLinear is Context {
     mapping(address => uint256) private _erc20Released;
     address private immutable _beneficiary;
     uint64 private immutable _start;
-    uint64 private immutable _duration;
+    uint256 private immutable _halfLife;
+    uint256 private immutable _duration;
 
     /**
      * @dev Set the beneficiary, start timestamp and vesting duration of the vesting wallet.
@@ -32,7 +33,8 @@ contract VestingWalletLinear is Context {
     constructor(
         address beneficiaryAddress,
         uint64 startTimestamp,
-        uint64 durationSeconds
+        uint256 halfLife,
+        uint256 duration
     ) payable {
         require(
             beneficiaryAddress != address(0),
@@ -40,7 +42,8 @@ contract VestingWalletLinear is Context {
         );
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;
-        _duration = durationSeconds;
+        _halfLife = halfLife;
+        _duration = duration;
     }
 
     /**
@@ -63,9 +66,16 @@ contract VestingWalletLinear is Context {
     }
 
     /**
-     * @dev Getter for the vesting duration.
+     * @dev Getter for the half life.
      */
-    function duration() public view virtual returns (uint256) {
+    function halfLife() public view returns (uint256) {
+        return _halfLife;
+    }
+
+    /**
+     * @dev Getter for duration.
+     */
+    function duration() public view returns (uint256) {
         return _duration;
     }
 
@@ -151,6 +161,19 @@ contract VestingWalletLinear is Context {
     }
 
     /**
+     * @dev Approximation of half life formula (1-(0.5^(t/h)))*value
+     */
+    function getAmount(
+        uint256 value,
+        uint256 t,
+        uint256 h
+    ) public pure returns (uint256) {
+        uint256 p = value >> (t / h);
+        t %= h;
+        return value - p + (p * t) / h / 2;
+    }
+
+    /**
      * @dev Virtual implementation of the vesting formula. This returns the amount vested, as a function of time, for
      * an asset given its total historical allocation.
      */
@@ -165,7 +188,8 @@ contract VestingWalletLinear is Context {
         } else if (timestamp > start() + duration()) {
             return totalAllocation;
         } else {
-            return (totalAllocation * (timestamp - start())) / duration();
+            uint256 timePassed = timestamp - start();
+            return getAmount(totalAllocation, timePassed, halfLife());
         }
     }
 }

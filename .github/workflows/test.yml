@@ -41,8 +41,5 @@ jobs:
         run: |
           brownie pm install OpenZeppelin/openzeppelin-contracts@4.7.0
 
-      - name: Make dftool executable
-        run: chmod +x dftool
-
       - name: Test with Brownie
         run: brownie test tests

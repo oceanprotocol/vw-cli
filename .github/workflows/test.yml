@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v1
 
       - name: Install Ganache
-        run: npm install -g ganache
+        run: npm install -g ganache-cli
 
       - name: Set up Python {{ matrix.python-version }}
         uses: actions/setup-python@v2

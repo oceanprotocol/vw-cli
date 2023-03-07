@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.7.0) (finance/VestingWallet.sol)
+// OpenZeppelin Contracts (last updated v4.8.0) (finance/VestingWallet.sol)
 pragma solidity ^0.8.0;
 
-import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/SafeERC20.sol";
-import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Address.sol";
-import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
+import "../token/ERC20/utils/SafeERC20.sol";
+import "../utils/Address.sol";
+import "../utils/Context.sol";
 
 /**
- * @title VestingWalletHalving
+ * @title VestingWallet
  * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
  * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
@@ -16,7 +16,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
  * Consequently, if the vesting has already started, any amount of tokens sent to this contract will (at least partly)
  * be immediately releasable.
  */
-contract VestingWalletHalving is Context {
+contract VestingWallet is Context {
     event EtherReleased(uint256 amount);
     event ERC20Released(address indexed token, uint256 amount);
 
@@ -24,8 +24,7 @@ contract VestingWalletHalving is Context {
     mapping(address => uint256) private _erc20Released;
     address private immutable _beneficiary;
     uint64 private immutable _start;
-    uint256 private immutable _halfLife;
-    uint256 private immutable _duration;
+    uint64 private immutable _duration;
 
     /**
      * @dev Set the beneficiary, start timestamp and vesting duration of the vesting wallet.
@@ -33,8 +32,7 @@ contract VestingWalletHalving is Context {
     constructor(
         address beneficiaryAddress,
         uint64 startTimestamp,
-        uint256 halfLife,
-        uint256 duration
+        uint64 durationSeconds
     ) payable {
         require(
             beneficiaryAddress != address(0),
@@ -42,8 +40,7 @@ contract VestingWalletHalving is Context {
         );
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;
-        _halfLife = halfLife;
-        _duration = duration;
+        _duration = durationSeconds;
     }
 
     /**
@@ -66,16 +63,9 @@ contract VestingWalletHalving is Context {
     }
 
     /**
-     * @dev Getter for the half life.
+     * @dev Getter for the vesting duration.
      */
-    function halfLife() public view returns (uint256) {
-        return _halfLife;
-    }
-
-    /**
-     * @dev Getter for duration.
-     */
-    function duration() public view returns (uint256) {
+    function duration() public view virtual returns (uint256) {
         return _duration;
     }
 
@@ -135,24 +125,19 @@ contract VestingWalletHalving is Context {
     /**
      * @dev Calculates the amount of ether that has already vested. Default implementation is a linear vesting curve.
      */
-    function vestedAmount(uint64 timestamp)
-        public
-        view
-        virtual
-        returns (uint256)
-    {
+    function vestedAmount(
+        uint64 timestamp
+    ) public view virtual returns (uint256) {
         return _vestingSchedule(address(this).balance + released(), timestamp);
     }
 
     /**
      * @dev Calculates the amount of tokens that has already vested. Default implementation is a linear vesting curve.
      */
-    function vestedAmount(address token, uint64 timestamp)
-        public
-        view
-        virtual
-        returns (uint256)
-    {
+    function vestedAmount(
+        address token,
+        uint64 timestamp
+    ) public view virtual returns (uint256) {
         return
             _vestingSchedule(
                 IERC20(token).balanceOf(address(this)) + released(token),
@@ -161,35 +146,19 @@ contract VestingWalletHalving is Context {
     }
 
     /**
-     * @dev Approximation of half life formula (1-(0.5^(t/h)))*value
-     */
-    function getAmount(
-        uint256 value,
-        uint256 t,
-        uint256 h
-    ) public pure returns (uint256) {
-        uint256 p = value >> (t / h);
-        t %= h;
-        return value - p + (p * t) / h / 2;
-    }
-
-    /**
      * @dev Virtual implementation of the vesting formula. This returns the amount vested, as a function of time, for
      * an asset given its total historical allocation.
      */
-    function _vestingSchedule(uint256 totalAllocation, uint64 timestamp)
-        internal
-        view
-        virtual
-        returns (uint256)
-    {
+    function _vestingSchedule(
+        uint256 totalAllocation,
+        uint64 timestamp
+    ) internal view virtual returns (uint256) {
         if (timestamp < start()) {
             return 0;
         } else if (timestamp > start() + duration()) {
             return totalAllocation;
         } else {
-            uint256 timePassed = timestamp - start();
-            return getAmount(totalAllocation, timePassed, halfLife());
+            return (totalAllocation * (timestamp - start())) / duration();
         }
     }
 }

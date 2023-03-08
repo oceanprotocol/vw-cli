@@ -19,7 +19,7 @@ payee1 = address1
 payee2 = address2
 chain = brownie.network.chain
 GOD_ACCOUNT = accounts[9]
-TOT_SUPPLY = 503370000
+TOT_SUPPLY = 503370000 * 1e18
 R_SUPPLIES = [
     TOT_SUPPLY * 0.1 - 1000,
     TOT_SUPPLY * 0.15 - 1000,

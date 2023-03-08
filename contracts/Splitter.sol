@@ -7,9 +7,9 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/Sa
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/security/ReentrancyGuard.sol";
 
-// @title Router
+// @title Splitter
 // @notice A contract that facilitates splitting payments among multiple payees based on their respective shares.
-contract Router is Ownable, ReentrancyGuard {
+contract Splitter is Ownable, ReentrancyGuard {
     // total shares held by all payees
     uint256 private _totalShares;
 
@@ -43,8 +43,8 @@ contract Router is Ownable, ReentrancyGuard {
      * @param shares_ The number of shares held by each payee.
      */
     constructor(address[] memory payees, uint256[] memory shares_) payable {
-        require(payees.length == shares_.length, "Router: payees and shares length mismatch");
-        require(payees.length > 0, "Router: no payees");
+        require(payees.length == shares_.length, "Splitter: payees and shares length mismatch");
+        require(payees.length > 0, "Splitter: no payees");
 
         for (uint256 i = 0; i < payees.length; i++) {
             _addPayee(payees[i], shares_[i]);
@@ -105,7 +105,7 @@ contract Router is Ownable, ReentrancyGuard {
     * @param token Address of the token to distribute.
     */
     function release(IERC20 token) external nonReentrant {
-        require(_totalShares > 0, "Router: no shares");
+        require(_totalShares > 0, "Splitter: no shares");
         uint256 balance = token.balanceOf(address(this));
         uint256 total = 0;
         for(uint256 i = 0; i < _payees.length; i++) {
@@ -162,9 +162,9 @@ contract Router is Ownable, ReentrancyGuard {
      * @param shares_ The number of shares owned by the payee.
      */
     function _addPayee(address account, uint256 shares_) private {
-        require(account != address(0), "Router: zero address");
-        require(shares_ > 0, "Router: shares are 0");
-        require(_shares[account] == 0, "Router: account already has shares");
+        require(account != address(0), "Splitter: zero address");
+        require(shares_ > 0, "Splitter: shares are 0");
+        require(_shares[account] == 0, "Splitter: account already has shares");
 
         _payees.push(account);
         _shares[account] = shares_;
@@ -177,8 +177,8 @@ contract Router is Ownable, ReentrancyGuard {
      * @param account The address of the payee to remove.
      */
     function _removePayee(address account) private {
-        require(account != address(0), "Router: zero address");
-        require(_shares[account] > 0, "Router: account has no shares");
+        require(account != address(0), "Splitter: zero address");
+        require(_shares[account] > 0, "Splitter: account has no shares");
 
         for (uint256 i = 0; i < _payees.length; i++) {
             if (_payees[i] == account) {
@@ -198,9 +198,9 @@ contract Router is Ownable, ReentrancyGuard {
      * @param shares_ The new number of shares.
      */
     function _adjustShare(address account, uint256 shares_) private {
-        require(account != address(0), "Router: zero address");
-        require(shares_ > 0, "Router: shares are 0");
-        require(_shares[account] > 0, "Router: account has no shares");
+        require(account != address(0), "Splitter: zero address");
+        require(shares_ > 0, "Splitter: shares are 0");
+        require(_shares[account] > 0, "Splitter: account has no shares");
 
         uint256 oldShares = _shares[account];
         _shares[account] = shares_;
@@ -212,6 +212,6 @@ contract Router is Ownable, ReentrancyGuard {
     //---------------------------- fallback ----------------------------
    
     receive() external payable virtual {
-        revert("Router: cannot receive ether");
+        revert("Splitter: cannot receive ether");
     }
 }

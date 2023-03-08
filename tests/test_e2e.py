@@ -108,7 +108,7 @@ def test_e2e():
 
 
 def test_e2e_with_release():
-    router = _deployRouter([100, 100], [payee1, payee2])
+    splitter = _deploySplitter([100, 100], [payee1, payee2])
     token = BROWNIE_PROJECT.Simpletoken.deploy(
         "TOK", "Test Token", 18, toBase18(TOT_SUPPLY), {"from": account0}
     )
@@ -127,7 +127,7 @@ def test_e2e_with_release():
         SUPPLY = R_SUPPLIES[ratchet_i]
         start_ts = start_times[ratchet_i]
         wallet = BROWNIE_PROJECT.VestingWalletHalving.deploy(
-            router.address,
+            splitter.address,
             start_ts,
             half_life,
             half_life * 3,
@@ -146,7 +146,7 @@ def test_e2e_with_release():
         chain.mine(blocks=1, timedelta=1)
         ts = chain.time()
 
-        bal_before = fromBase18(token.balanceOf(router))
+        bal_before = fromBase18(token.balanceOf(splitter))
 
         contract_amts = []
         approx_amts = [
@@ -162,7 +162,7 @@ def test_e2e_with_release():
             contract_amts.append(amt)
             print(R_SUPPLIES[0], ts - start_times[0], half_life, amt)
 
-        bal_after = fromBase18(token.balanceOf(router))
+        bal_after = fromBase18(token.balanceOf(splitter))
 
         sum_actual = sum(contract_amts)
 
@@ -170,7 +170,7 @@ def test_e2e_with_release():
 
         payee1_before = fromBase18(token.balanceOf(payee1))
         payee2_before = fromBase18(token.balanceOf(payee2))
-        router.release(taddress, {"from": account0})
+        splitter.release(taddress, {"from": account0})
         payee1_after = fromBase18(token.balanceOf(payee1))
         payee2_after = fromBase18(token.balanceOf(payee2))
 
@@ -226,5 +226,5 @@ def _approx(value, t, h):
     return value - p + (p * t) / h / 2
 
 
-def _deployRouter(shares, addresses):
-    return BROWNIE_PROJECT.Router.deploy(addresses, shares, {"from": accounts[0]})
+def _deploySplitter(shares, addresses):
+    return BROWNIE_PROJECT.Splitter.deploy(addresses, shares, {"from": accounts[0]})

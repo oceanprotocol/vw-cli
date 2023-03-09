@@ -19,7 +19,7 @@ payee1 = address1
 payee2 = address2
 chain = brownie.network.chain
 GOD_ACCOUNT = accounts[9]
-TOT_SUPPLY = 503370000
+TOT_SUPPLY = 503370000 * 1e18
 R_SUPPLIES = [
     TOT_SUPPLY * 0.1 - 1000,
     TOT_SUPPLY * 0.15 - 1000,
@@ -203,8 +203,8 @@ def test_e2e_with_release():
     # take a sum of 4 plots
     sum_vested = [sum(x) for x in zip(*plts)]
     plt.plot(sum_vested)
-    plt.yticks(np.arange(0, max(sum_vested), 100000))
-    plt.xticks(np.arange(0, len(sum_vested), 20))
+    # plt.yticks(np.arange(0, max(sum_vested), 100000))
+    # plt.xticks(np.arange(0, len(sum_vested), 20))
     # increase width of the plot
     fig = plt.gcf()
     fig.set_size_inches(18.5, 10.5)

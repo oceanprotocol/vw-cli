@@ -11,7 +11,7 @@ address2 = brownie.network.accounts[2].address
 chain = brownie.network.chain
 
 
-def test_basic():
+def test_ownership_and_admin_commands():
     beneficiary = address1
     start_ts = chain.time()
     ts_duration = 1000

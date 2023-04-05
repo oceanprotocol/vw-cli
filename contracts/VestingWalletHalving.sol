@@ -195,11 +195,11 @@ contract VestingWalletHalving is Context, Ownable {
     }
 
     // ----- ADMIN FUNCTIONS -----
-    function rennounceVesting(address token) onlyOwner {
+    function rennounceVesting(address token) external onlyOwner {
         SafeERC20.safeTransfer(IERC20(token), owner(), IERC20(token).balanceOf(address(this)));
     }
 
-    function changeBeneficiary(address beneficiary) onlyOwner {
-        _beneficiary = beneficiary;
+    function changeBeneficiary(address beneficiary_) external onlyOwner {
+        _beneficiary = beneficiary_;
     }
 }

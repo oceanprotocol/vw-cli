@@ -176,6 +176,6 @@ contract VestingWalletLinear is Context, Ownable {
     }
 
     function changeBeneficiary(address beneficiary) onlyOwner {
-        _beneficiary = beneficiary
+        _beneficiary = beneficiary;
     }
 }

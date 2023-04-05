@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/SafeERC20.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Address.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
+import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
 
 /**
  * @title VestingWalletHalving
@@ -16,13 +17,13 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
  * Consequently, if the vesting has already started, any amount of tokens sent to this contract will (at least partly)
  * be immediately releasable.
  */
-contract VestingWalletHalving is Context {
+contract VestingWalletHalving is Context, Ownable {
     event EtherReleased(uint256 amount);
     event ERC20Released(address indexed token, uint256 amount);
 
     uint256 private _released;
     mapping(address => uint256) private _erc20Released;
-    address private immutable _beneficiary;
+    address private _beneficiary;
     uint64 private immutable _start;
     uint256 private immutable _halfLife;
     uint256 private immutable _duration;
@@ -191,5 +192,14 @@ contract VestingWalletHalving is Context {
             uint256 timePassed = timestamp - start();
             return getAmount(totalAllocation, timePassed, halfLife());
         }
+    }
+
+    // ----- ADMIN FUNCTIONS -----
+    function rennounceVesting(address token) onlyOwner {
+        SafeERC20.safeTransfer(IERC20(token), owner(), IERC20(token).balanceOf(address(this)));
+    }
+
+    function changeBeneficiary(address beneficiary) onlyOwner {
+        _beneficiary = beneficiary
     }
 }

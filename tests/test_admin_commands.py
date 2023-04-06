@@ -32,7 +32,7 @@ def test_ownership_and_admin_commands():
     
     for vw in [vw1, vw2]:
         token = BROWNIE_PROJECT.Simpletoken.deploy(
-            "TOK", "Test Token", 18, toBase18(300.0), {"from": account0}
+            "TOK", "Test Token", 18, toBase18(100.0), {"from": account0}
         )
         token.transfer(vw.address, toBase18(100.0), {"from": account0})
 
@@ -46,3 +46,9 @@ def test_ownership_and_admin_commands():
         assert token.balanceOf(vw.address) == toBase18(100.0)
         vw.rennounceVesting(token.address, {"from": account0})
         assert token.balanceOf(vw.address) == toBase18(0.0)
+
+        with brownie.reverts("Ownable: caller is not the owner"):
+            vw.rennounceVesting(token.address, {"from": account1})
+
+
+        assert token.balanceOf(account0) == toBase18(100.0)

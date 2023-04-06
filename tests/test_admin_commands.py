@@ -50,5 +50,4 @@ def test_ownership_and_admin_commands():
         with brownie.reverts("Ownable: caller is not the owner"):
             vw.rennounceVesting(token.address, {"from": account1})
 
-
         assert token.balanceOf(account0) == toBase18(100.0)

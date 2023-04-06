@@ -6,7 +6,8 @@ from util.constants import BROWNIE_PROJECT
 
 accounts = brownie.network.accounts
 account0 = accounts[0]
-address1 = brownie.network.accounts[1].address
+account1 = accounts[1]
+address1 = account1.address
 address2 = brownie.network.accounts[2].address
 chain = brownie.network.chain
 

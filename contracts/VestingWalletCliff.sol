@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/SafeERC20.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Address.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
+import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
 
 /**
  * @title VestingWalletCliff
@@ -16,7 +17,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
  * Consequently, if the vesting has already started, any amount of tokens sent to this contract will (at least partly)
  * be immediately releasable.
  */
-contract VestingWalletCliff is Context {
+contract VestingWalletCliff is Context, Ownable {
     event EtherReleased(address indexed beneficiary, uint256 amount);
     event ERC20Released(address indexed beneficiary, address indexed token, uint256 amount);
     

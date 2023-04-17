@@ -108,7 +108,7 @@ contract Splitter is Ownable, ReentrancyGuard {
     function release(IERC20 token) external nonReentrant {
         require(_totalShares > 0, "Splitter: no shares");
         uint256 balance = token.balanceOf(address(this));
-        if(balance<1) return
+        if(balance<1) return;
         balance = balance - 1; //keep 1 wei in the contract
         uint256 total = 0;
         for(uint256 i = 0; i < _payees.length; i++) {

@@ -22,7 +22,7 @@ contract VestingWalletHalving is Context, Ownable {
     event ERC20Released(address indexed beneficiary, address indexed token, uint256 amount);
     
     event BeneficiaryChanged(address indexed newBeneficiary);
-    event RennounceVesting(address indexed token, address indexed owner, uint256 amount);
+    event RenounceVesting(address indexed token, address indexed owner, uint256 amount);
     
 
     uint256 private _released;
@@ -199,9 +199,9 @@ contract VestingWalletHalving is Context, Ownable {
     }
 
     // ----- ADMIN FUNCTIONS -----
-    function rennounceVesting(address token) external onlyOwner {
+    function renounceVesting(address token) external onlyOwner {
         uint256 amount = IERC20(token).balanceOf(address(this));
-        emit RennounceVesting(token, owner(), amount);
+        emit RenounceVesting(token, owner(), amount);
         SafeERC20.safeTransfer(IERC20(token), owner(), amount);
         
     }

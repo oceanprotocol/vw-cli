@@ -18,8 +18,12 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
  * be immediately releasable.
  */
 contract VestingWalletLinear is Context, Ownable {
-    event EtherReleased(uint256 amount);
-    event ERC20Released(address indexed token, uint256 amount);
+    event EtherReleased(address indexed beneficiary, uint256 amount);
+    event ERC20Released(address indexed beneficiary, address indexed token, uint256 amount);
+    
+    event BeneficiaryChanged(address indexed newBeneficiary);
+    event RennounceVesting(address indexed token, address indexed owner, uint256 amount);
+    
 
     uint256 private _released;
     mapping(address => uint256) private _erc20Released;
@@ -107,7 +111,7 @@ contract VestingWalletLinear is Context, Ownable {
     function release() public virtual {
         uint256 amount = releasable();
         _released += amount;
-        emit EtherReleased(amount);
+        emit EtherReleased(beneficiary(), amount);
         Address.sendValue(payable(beneficiary()), amount);
     }
 
@@ -119,7 +123,7 @@ contract VestingWalletLinear is Context, Ownable {
     function release(address token) public virtual {
         uint256 amount = releasable(token);
         _erc20Released[token] += amount;
-        emit ERC20Released(token, amount);
+        emit ERC20Released(beneficiary(), token, amount);
         SafeERC20.safeTransfer(IERC20(token), beneficiary(), amount);
     }
 
@@ -172,10 +176,15 @@ contract VestingWalletLinear is Context, Ownable {
 
     // ----- ADMIN FUNCTIONS -----
     function rennounceVesting(address token) external onlyOwner {
-        SafeERC20.safeTransfer(IERC20(token), owner(), IERC20(token).balanceOf(address(this)));
+        uint256 amount = IERC20(token).balanceOf(address(this));
+        emit RennounceVesting(token, owner(), amount);
+        SafeERC20.safeTransfer(IERC20(token), owner(), amount);
+        
     }
 
-    function changeBeneficiary(address beneficiary_) external onlyOwner {
-        _beneficiary = beneficiary_;
+    function changeBeneficiary(address beneficiary) external onlyOwner {
+        require(beneficiary!= address(0),"VestingWallet: beneficiary is zero address");
+        _beneficiary = beneficiary;
+        emit BeneficiaryChanged(beneficiary);
     }
 }

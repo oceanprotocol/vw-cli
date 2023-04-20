@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/SafeERC20.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Address.sol";
 import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
+import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
 
 /**
  * @title VestingWalletCliff
@@ -16,13 +17,17 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
  * Consequently, if the vesting has already started, any amount of tokens sent to this contract will (at least partly)
  * be immediately releasable.
  */
-contract VestingWalletCliff is Context {
-    event EtherReleased(uint256 amount);
-    event ERC20Released(address indexed token, uint256 amount);
+contract VestingWalletCliff is Context, Ownable {
+    event EtherReleased(address indexed beneficiary, uint256 amount);
+    event ERC20Released(address indexed beneficiary, address indexed token, uint256 amount);
+    
+    event BeneficiaryChanged(address indexed newBeneficiary);
+    event RenounceVesting(address indexed token, address indexed owner, uint256 amount);
+    
 
     uint256 private _released;
     mapping(address => uint256) private _erc20Released;
-    address private immutable _beneficiary;
+    address private _beneficiary;
     uint64 private immutable _start;
     uint64 private immutable _duration;
 
@@ -104,9 +109,13 @@ contract VestingWalletCliff is Context {
      * Emits a {EtherReleased} event.
      */
     function release() public virtual {
+        require(
+            beneficiary() != address(0),
+            "VestingWallet: beneficiary is zero address"
+        );
         uint256 amount = releasable();
         _released += amount;
-        emit EtherReleased(amount);
+        emit EtherReleased(beneficiary(), amount);
         Address.sendValue(payable(beneficiary()), amount);
     }
 
@@ -116,9 +125,13 @@ contract VestingWalletCliff is Context {
      * Emits a {ERC20Released} event.
      */
     function release(address token) public virtual {
+        require(
+            beneficiary() != address(0),
+            "VestingWallet: beneficiary is zero address"
+        );
         uint256 amount = releasable(token);
         _erc20Released[token] += amount;
-        emit ERC20Released(token, amount);
+        emit ERC20Released(beneficiary(), token, amount);
         SafeERC20.safeTransfer(IERC20(token), beneficiary(), amount);
     }
 
@@ -165,5 +178,19 @@ contract VestingWalletCliff is Context {
         } else {
             return 0;
         }
+    }
+
+    // ----- ADMIN FUNCTIONS -----
+    function renounceVesting(address token) external onlyOwner {
+        uint256 amount = IERC20(token).balanceOf(address(this));
+        emit RenounceVesting(token, owner(), amount);
+        SafeERC20.safeTransfer(IERC20(token), owner(), amount);
+        
+    }
+
+    function changeBeneficiary(address beneficiary) external onlyOwner {
+        require(beneficiary!= address(0),"VestingWallet: beneficiary is zero address");
+        _beneficiary = beneficiary;
+        emit BeneficiaryChanged(beneficiary);
     }
 }

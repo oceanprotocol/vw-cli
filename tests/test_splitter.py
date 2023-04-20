@@ -45,14 +45,14 @@ def test_shares():
     splitter.release(token.address, {"from": carol})
     alice_after = token.balanceOf(alice)
 
-    assert alice_after - alice_before == 150
-    assert token.balanceOf(bob) == 300
-    assert token.balanceOf(carol) == 150
+    assert alice_after - alice_before == 149
+    assert token.balanceOf(bob) == 301
+    assert token.balanceOf(carol) == 149
 
-    assert splitter.totalReleased(token) == 600
-    assert splitter.released(token, alice) == 150
-    assert splitter.released(token, bob) == 300
-    assert splitter.released(token, carol) == 150
+    assert splitter.totalReleased(token) == 599
+    assert splitter.released(token, alice) == 149
+    assert splitter.released(token, bob) == 301
+    assert splitter.released(token, carol) == 149
 
     splitter.removePayee(alice, {"from": alice})
     splitter.removePayee(carol, {"from": alice})

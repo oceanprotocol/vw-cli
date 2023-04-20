@@ -109,6 +109,10 @@ contract VestingWalletLinear is Context, Ownable {
      * Emits a {EtherReleased} event.
      */
     function release() public virtual {
+        require(
+            beneficiary() != address(0),
+            "VestingWallet: beneficiary is zero address"
+        );
         uint256 amount = releasable();
         _released += amount;
         emit EtherReleased(beneficiary(), amount);
@@ -121,6 +125,10 @@ contract VestingWalletLinear is Context, Ownable {
      * Emits a {ERC20Released} event.
      */
     function release(address token) public virtual {
+        require(
+            beneficiary() != address(0),
+            "VestingWallet: beneficiary is zero address"
+        );
         uint256 amount = releasable(token);
         _erc20Released[token] += amount;
         emit ERC20Released(beneficiary(), token, amount);

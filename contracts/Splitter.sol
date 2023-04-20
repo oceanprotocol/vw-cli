@@ -21,7 +21,7 @@ contract Splitter is Ownable, ReentrancyGuard {
 
     // emitted when tokens are released to payees
     event PaymentReleased(IERC20 indexed token, uint256 amount);
-    event PayeePaid(IERC20 indexed token, address indexed acount, uint256 amount);
+    event PayeePaid(IERC20 indexed token, address indexed account, uint256 amount);
 
     // emitted when a payee is removed
     event PayeeRemoved(address account, uint256 shares);

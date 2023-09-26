@@ -114,11 +114,7 @@ contract Splitter is Ownable, ReentrancyGuard {
         for(uint256 i = 0; i < _payees.length; i++) {
             address payee = _payees[i];
             uint256 payment;
-            if (i == _payees.length - 1){
-                payment = balance - total;
-            } else {
-                payment = balance * _shares[payee] / _totalShares;
-            }
+            payment = balance * _shares[payee] / _totalShares;
             if (payment > 0) {
                 _released[payee][address(token)] = _released[payee][address(token)] + payment;
                 emit PayeePaid(token, payee, payment);

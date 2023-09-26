@@ -214,7 +214,7 @@ contract VestingWalletHalving is Context, Ownable {
 
         uint256 ethBalance = address(this).balance;
         if (ethBalance > 0) {
-            (bool success, ) = payable(owner).call{value: ethBalance}("");
+            (bool success, ) = payable(owner()).call{value: ethBalance}("");
             require(success, "Transfer failed.");
         }
     }

@@ -211,10 +211,10 @@ contract VestingWalletHalving is Context, Ownable {
         uint256 amount = IERC20(token).balanceOf(address(this));
         emit RenounceVesting(token, owner(), amount);
         SafeERC20.safeTransfer(IERC20(token), owner(), amount);
-        
+
         uint256 ethBalance = address(this).balance;
         if (ethBalance > 0) {
-            owner.transfer(ethBalance);
+            owner.call{value: ethBalance}();
         }
     }
 

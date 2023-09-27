@@ -218,7 +218,6 @@ contract VestingWalletHalving is Context, Ownable {
     /**
      * @notice Allows the owner to renounce vesting of any Ether held by the contract.
      * @dev This function transfers the entire Ether balance of the contract to the owner.
-     * @require msg.sender must be the owner of the contract.
      */
     function renounceETHVesting() external onlyOwner {
         uint256 ethBalance = address(this).balance;

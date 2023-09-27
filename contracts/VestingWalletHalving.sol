@@ -23,6 +23,7 @@ contract VestingWalletHalving is Context, Ownable {
     
     event BeneficiaryChanged(address indexed newBeneficiary);
     event RenounceVesting(address indexed token, address indexed owner, uint256 amount);
+    event RenounceETHVesting(address indexed owner, uint256 amount);
     
 
     uint256 private _released;
@@ -212,11 +213,21 @@ contract VestingWalletHalving is Context, Ownable {
         emit RenounceVesting(token, owner(), amount);
         SafeERC20.safeTransfer(IERC20(token), owner(), amount);
 
+    }
+
+    /**
+     * @notice Allows the owner to renounce vesting of any Ether held by the contract.
+     * @dev This function transfers the entire Ether balance of the contract to the owner.
+     * @require msg.sender must be the owner of the contract.
+     */
+    function renounceETHVesting() external onlyOwner {
         uint256 ethBalance = address(this).balance;
-        if (ethBalance > 0) {
-            (bool success, ) = payable(owner()).call{value: ethBalance}("");
-            require(success, "Transfer failed.");
-        }
+        require(ethBalance > 0, "No ETH balance to transfer.");
+
+        (bool success, ) = payable(owner()).call{value: ethBalance}("");
+        require(success, "ETH Transfer failed.");
+
+        emit RenounceETHVesting(owner(), ethBalance);
     }
 
     function changeBeneficiary(address beneficiary) external onlyOwner {

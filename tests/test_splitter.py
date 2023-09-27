@@ -49,7 +49,7 @@ def test_shares():
     assert token.balanceOf(bob) == 299
     assert token.balanceOf(carol) == 149
 
-    assert splitter.totalReleased(token) == 599
+    assert splitter.totalReleased(token) == 597
     assert splitter.released(token, alice) == 149
     assert splitter.released(token, bob) == 299
     assert splitter.released(token, carol) == 149

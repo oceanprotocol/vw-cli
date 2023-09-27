@@ -9,7 +9,7 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
 
 /**
  * @title VestingWalletHalving
- * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
+ * @dev This contract can receive native currency and ERC20 tokens. Custody of multiple tokens
  * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
  *

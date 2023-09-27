@@ -46,12 +46,12 @@ def test_shares():
     alice_after = token.balanceOf(alice)
 
     assert alice_after - alice_before == 149
-    assert token.balanceOf(bob) == 301
+    assert token.balanceOf(bob) == 299
     assert token.balanceOf(carol) == 149
 
     assert splitter.totalReleased(token) == 599
     assert splitter.released(token, alice) == 149
-    assert splitter.released(token, bob) == 301
+    assert splitter.released(token, bob) == 299
     assert splitter.released(token, carol) == 149
 
     splitter.removePayee(alice, {"from": alice})

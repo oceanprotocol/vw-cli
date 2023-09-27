@@ -17,17 +17,17 @@ contract Splitter is Ownable, ReentrancyGuard {
     mapping(address => uint256) private _totalReleased;
 
     // emitted when a new payee is added
-    event PayeeAdded(address account, uint256 shares);
+    event PayeeAdded(address indexed account, uint256 shares);
 
     // emitted when tokens are released to payees
     event PaymentReleased(IERC20 indexed token, uint256 amount);
     event PayeePaid(IERC20 indexed token, address indexed account, uint256 amount);
 
     // emitted when a payee is removed
-    event PayeeRemoved(address account, uint256 shares);
+    event PayeeRemoved(address indexed account, uint256 shares);
 
     // emitted when a payee's share is adjusted
-    event PayeeShareAdjusted(address account, uint256 shares, uint256 oldShares);
+    event PayeeShareAdjusted(address indexed account, uint256 shares, uint256 oldShares);
 
     // mapping of payee addresses to their shares
     mapping(address => uint256) private _shares;

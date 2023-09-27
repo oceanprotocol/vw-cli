@@ -210,8 +210,6 @@ contract VestingWalletHalving is Context, Ownable {
      * @notice Allows the owner to renounce vesting of the specified token.
      * @dev This function transfers the entire token and ETH balance of the contract to the owner.
      * @param token The address of the ERC-20 token to be renounced.
-     * @emit RenounceVesting emits an event with the token address, owner address, and the amount renounced.
-     * @require msg.sender must be the owner of the contract.
      */
     function renounceVesting(address token) external onlyOwner {
         uint256 amount = IERC20(token).balanceOf(address(this));
@@ -223,9 +221,6 @@ contract VestingWalletHalving is Context, Ownable {
      * @notice Allows the owner to change the beneficiary address.
      * @dev Changes the beneficiary of the contract to the provided address. 
      * @param beneficiary The address of the new beneficiary.
-     * @emit BeneficiaryChanged emits an event with the new beneficiary address.
-     * @require msg.sender must be the owner of the contract.
-     * @require beneficiary must be a non-zero address.
      */
     function changeBeneficiary(address beneficiary) external onlyOwner {
         require(beneficiary!= address(0),"VestingWallet: beneficiary is zero address");

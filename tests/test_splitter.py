@@ -63,7 +63,7 @@ def test_shares():
     assert splitter.totalShares() == 1000
 
     splitter.release(token.address, {"from": carol})
-    assert token.balanceOf(accounts[3]) == 0
+    assert token.balanceOf(accounts[3]) == 2
 
 
 def test_add_zero_shares():

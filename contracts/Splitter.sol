@@ -43,7 +43,7 @@ contract Splitter is Ownable, ReentrancyGuard {
      * @param payees The addresses of the payees.
      * @param shares_ The number of shares held by each payee.
      */
-    constructor(address[] memory payees, uint256[] memory shares_) payable {
+    constructor(address[] memory payees, uint256[] memory shares_) {
         require(payees.length == shares_.length, "Splitter: payees and shares length mismatch");
         require(payees.length > 0, "Splitter: no payees");
 
@@ -210,12 +210,5 @@ contract Splitter is Ownable, ReentrancyGuard {
         _shares[account] = shares_;
         _totalShares = _totalShares - oldShares + shares_;
         emit PayeeShareAdjusted(account, shares_, oldShares);
-    }
-
-
-    //---------------------------- fallback ----------------------------
-   
-    receive() external payable virtual {
-        revert("Splitter: cannot receive ether");
     }
 }

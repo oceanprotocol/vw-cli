@@ -11,7 +11,7 @@ import { Ownable } from "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/acc
 /**
  * @title VestingWalletHalving
  * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
- * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
+ * can be given to this 2, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
  *
  * Any token transferred to this contract will follow the vesting schedule as if they were locked from the beginning.
@@ -207,14 +207,22 @@ contract VestingWalletHalving is Context, Ownable {
         }
     }
 
-    // ----- ADMIN FUNCTIONS -----
+    /**
+     * @notice Allows the owner to renounce vesting of the specified token.
+     * @dev This function transfers the entire token and ETH balance of the contract to the owner.
+     * @param token The address of the ERC-20 token to be renounced.
+     */
     function renounceVesting(address token) external onlyOwner {
         uint256 amount = IERC20(token).balanceOf(address(this));
         emit RenounceVesting(token, owner(), amount);
         SafeERC20.safeTransfer(IERC20(token), owner(), amount);
-        
     }
 
+    /**
+     * @notice Allows the owner to change the beneficiary address.
+     * @dev Changes the beneficiary of the contract to the provided address. 
+     * @param beneficiary The address of the new beneficiary.
+     */
     function changeBeneficiary(address beneficiary) external onlyOwner {
         require(beneficiary!= address(0),"VestingWallet: beneficiary is zero address");
         _beneficiary = beneficiary;

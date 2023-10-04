@@ -46,6 +46,23 @@ contract VestingWalletHalving is Context, Ownable {
             beneficiaryAddress != address(0),
             "VestingWallet: beneficiary is zero address"
         );
+
+        uint64 currentTime = uint64(block.timestamp);
+        require(
+            startTimestamp >= currentTime && startTimestamp <= currentTime + 3000 days,
+            "VestingWallet: startTimestamp out of range"
+        );
+        
+        require(
+            halfLife > 0,
+            "VestingWallet: halfLife must be greater than zero"
+        );
+        
+        require(
+            duration > 0,
+            "VestingWallet: duration must be greater than zero"
+        );
+
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;
         _halfLife = halfLife;

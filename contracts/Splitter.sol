@@ -17,17 +17,17 @@ contract Splitter is Ownable, ReentrancyGuard {
     mapping(address => uint256) private _totalReleased;
 
     // emitted when a new payee is added
-    event PayeeAdded(address account, uint256 shares);
+    event PayeeAdded(address indexed account, uint256 shares);
 
     // emitted when tokens are released to payees
     event PaymentReleased(IERC20 indexed token, uint256 amount);
     event PayeePaid(IERC20 indexed token, address indexed account, uint256 amount);
 
     // emitted when a payee is removed
-    event PayeeRemoved(address account, uint256 shares);
+    event PayeeRemoved(address indexed account, uint256 shares);
 
     // emitted when a payee's share is adjusted
-    event PayeeShareAdjusted(address account, uint256 shares, uint256 oldShares);
+    event PayeeShareAdjusted(address indexed account, uint256 shares, uint256 oldShares);
 
     // mapping of payee addresses to their shares
     mapping(address => uint256) private _shares;
@@ -43,7 +43,7 @@ contract Splitter is Ownable, ReentrancyGuard {
      * @param payees The addresses of the payees.
      * @param shares_ The number of shares held by each payee.
      */
-    constructor(address[] memory payees, uint256[] memory shares_) payable {
+    constructor(address[] memory payees, uint256[] memory shares_) {
         require(payees.length == shares_.length, "Splitter: payees and shares length mismatch");
         require(payees.length > 0, "Splitter: no payees");
 
@@ -114,11 +114,7 @@ contract Splitter is Ownable, ReentrancyGuard {
         for(uint256 i = 0; i < _payees.length; i++) {
             address payee = _payees[i];
             uint256 payment;
-            if (i == _payees.length - 1){
-                payment = balance - total;
-            } else {
-                payment = balance * _shares[payee] / _totalShares;
-            }
+            payment = balance * _shares[payee] / _totalShares;
             if (payment > 0) {
                 _released[payee][address(token)] = _released[payee][address(token)] + payment;
                 emit PayeePaid(token, payee, payment);
@@ -210,12 +206,5 @@ contract Splitter is Ownable, ReentrancyGuard {
         _shares[account] = shares_;
         _totalShares = _totalShares - oldShares + shares_;
         emit PayeeShareAdjusted(account, shares_, oldShares);
-    }
-
-
-    //---------------------------- fallback ----------------------------
-   
-    receive() external payable virtual {
-        revert("Splitter: cannot receive ether");
     }
 }

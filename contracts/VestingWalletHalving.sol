@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: (Apache-2.0 AND MIT)
 pragma solidity ^0.8.0;
 
-import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/SafeERC20.sol";
-import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Address.sol";
-import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
-import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
+import { SafeERC20, IERC20 } from "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/token/ERC20/utils/SafeERC20.sol";
+import { Address } from "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Address.sol";
+import { Context } from "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/utils/Context.sol";
+import { Ownable } from "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
+
 
 /**
  * @title VestingWalletHalving
  * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
- * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
+ * can be given to this 2, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
  *
  * Any token transferred to this contract will follow the vesting schedule as if they were locked from the beginning.
@@ -46,6 +47,23 @@ contract VestingWalletHalving is Context, Ownable {
             beneficiaryAddress != address(0),
             "VestingWallet: beneficiary is zero address"
         );
+
+        uint64 currentTime = uint64(block.timestamp);
+        require(
+            startTimestamp >= currentTime && startTimestamp <= currentTime + 3000 days,
+            "VestingWallet: startTimestamp out of range"
+        );
+        
+        require(
+            halfLife > 0,
+            "VestingWallet: halfLife must be greater than zero"
+        );
+        
+        require(
+            duration > 0,
+            "VestingWallet: duration must be greater than zero"
+        );
+
         _beneficiary = beneficiaryAddress;
         _start = startTimestamp;
         _halfLife = halfLife;
@@ -120,10 +138,6 @@ contract VestingWalletHalving is Context, Ownable {
      * Emits a {EtherReleased} event.
      */
     function release() public virtual {
-        require(
-            beneficiary() != address(0),
-            "VestingWallet: beneficiary is zero address"
-        );
         uint256 amount = releasable();
         _released += amount;
         emit EtherReleased(beneficiary(), amount);
@@ -136,10 +150,6 @@ contract VestingWalletHalving is Context, Ownable {
      * Emits a {ERC20Released} event.
      */
     function release(address token) public virtual {
-        require(
-            beneficiary() != address(0),
-            "VestingWallet: beneficiary is zero address"
-        );
         uint256 amount = releasable(token);
         _erc20Released[token] += amount;
         emit ERC20Released(beneficiary(), token, amount);
@@ -207,12 +217,15 @@ contract VestingWalletHalving is Context, Ownable {
         }
     }
 
-    // ----- ADMIN FUNCTIONS -----
+    /**
+     * @notice Allows the owner to renounce vesting of the specified token.
+     * @dev This function transfers the entire token and ETH balance of the contract to the owner.
+     * @param token The address of the ERC-20 token to be renounced.
+     */
     function renounceVesting(address token) external onlyOwner {
         uint256 amount = IERC20(token).balanceOf(address(this));
         emit RenounceVesting(token, owner(), amount);
         SafeERC20.safeTransfer(IERC20(token), owner(), amount);
-
     }
 
     /**
@@ -229,6 +242,11 @@ contract VestingWalletHalving is Context, Ownable {
         emit RenounceETHVesting(owner(), ethBalance);
     }
 
+    /**
+     * @notice Allows the owner to change the beneficiary address.
+     * @dev Changes the beneficiary of the contract to the provided address. 
+     * @param beneficiary The address of the new beneficiary.
+     */
     function changeBeneficiary(address beneficiary) external onlyOwner {
         require(beneficiary!= address(0),"VestingWallet: beneficiary is zero address");
         _beneficiary = beneficiary;

@@ -9,7 +9,12 @@ import "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/access/Ownable.sol";
 
 /**
  * @title VestingWalletHalving
- * @dev This contract can receive native currency and ERC20 tokens. Custody of multiple tokens
+ * @dev This contract can receive native currency and most of ERC20 tokens. 
+ * Although is was built and tested with OCEAN token, it works with other tokens, as long as they are not implementing
+ * werd function returns
+ * (see https://github.com/d-xo/weird-erc20/tree/266025c555b42b2dd2517fd99f7d47032ec99abe#weird-erc20-tokens)
+ * 
+ * Custody of multiple tokens
  * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
  *

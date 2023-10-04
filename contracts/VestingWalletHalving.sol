@@ -10,8 +10,13 @@ import { Ownable } from "OpenZeppelin/openzeppelin-contracts@4.7.0/contracts/acc
 
 /**
  * @title VestingWalletHalving
- * @dev This contract handles the vesting of Eth and ERC20 tokens for a given beneficiary. Custody of multiple tokens
- * can be given to this 2, which will release the token to the beneficiary following a given vesting schedule.
+ * @dev This contract can receive native currency and most of ERC20 tokens. 
+ * Although is was built and tested with OCEAN token, it works with other tokens, as long as they are not implementing
+ * weird function returns
+ * (see https://github.com/d-xo/weird-erc20/tree/266025c555b42b2dd2517fd99f7d47032ec99abe#weird-erc20-tokens)
+ * 
+ * Custody of multiple tokens
+ * can be given to this contract, which will release the token to the beneficiary following a given vesting schedule.
  * The vesting schedule is customizable through the {vestedAmount} function.
  *
  * Any token transferred to this contract will follow the vesting schedule as if they were locked from the beginning.
